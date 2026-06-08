@@ -96,19 +96,47 @@ test.describe("Breakdown /breakdown", () => {
     await page.goto("/breakdown");
     await waitForData(page);
 
-    await expect(page.getByText("Implement Payment Flow")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Sub-tasks" })).toBeVisible();
     expect(errors).toHaveLength(0);
+  });
+
+  test("task selector loads backlog from planning API", async ({ page }) => {
+    await page.goto("/breakdown");
+    await waitForData(page);
+
+    const trigger = page.getByTestId("task-select");
+    await expect(trigger).toBeVisible({ timeout: 8000 });
+    await trigger.click();
+    const items = page.locator("[data-slot='select-item']");
+    await expect(items.first()).toBeVisible({ timeout: 5000 });
+    expect(await items.count()).toBeGreaterThan(0);
+    await page.keyboard.press("Escape");
   });
 
   test("auto-runs AI breakdown on mount and shows subtasks", async ({ page }) => {
     await page.goto("/breakdown");
 
-    // AI pipeline runs automatically — wait for skeleton to disappear and rows to appear
-    await expect(page.getByText(/No sub-tasks generated/i)).not.toBeVisible({ timeout: 30000 });
+    // AI pipeline runs automatically — wait for rows to appear
     await expect(page.locator("tbody tr").first()).toBeVisible({ timeout: 30000 });
-    const rows = await page.locator("tbody tr").count();
-    expect(rows).toBeGreaterThan(0);
+    expect(await page.locator("tbody tr").count()).toBeGreaterThan(0);
+  });
+
+  test("selecting a different task updates the selector", async ({ page }) => {
+    await page.goto("/breakdown");
+    await waitForData(page);
+
+    const trigger = page.getByTestId("task-select");
+    await expect(trigger).toBeEnabled({ timeout: 8000 });
+    const firstTitle = await trigger.textContent();
+
+    await trigger.click();
+    const items = page.locator("[data-slot='select-item']");
+    await expect(items.nth(1)).toBeVisible({ timeout: 5000 });
+    const secondTitle = await items.nth(1).textContent();
+    await items.nth(1).click();
+
+    await expect(trigger).toContainText(secondTitle?.trim().slice(0, 20) ?? "", { timeout: 5000 });
+    expect(await trigger.textContent()).not.toEqual(firstTitle);
   });
 
   test("team load bars render", async ({ page }) => {

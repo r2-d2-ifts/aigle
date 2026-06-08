@@ -1,37 +1,50 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Monitor, Server, Database, FlaskConical, RotateCcw, Sparkles, Loader2 } from "lucide-react";
+import { Monitor, Server, Database, FlaskConical, RotateCcw, Sparkles, Loader2, Bug, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApiData } from "@/hooks/useApiData";
-import type { Subtask } from "@/lib/types";
+import type { BacklogTask, Subtask } from "@/lib/types";
 
+const planningFallback = { backlog: [] as BacklogTask[], sprints: [] };
 const teamFallback = { teamLoad: [] as { name: string; load: number }[] };
 
 type AssignedSubtask = Subtask & { description?: string; dependencies?: string[] };
 
 const typeStyle: Record<string, { icon: typeof Monitor; cls: string }> = {
-  FE: { icon: Monitor, cls: "bg-sky-500/15 text-sky-400 border-sky-500/30" },
-  BE: { icon: Server, cls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" },
-  DB: { icon: Database, cls: "bg-orange-500/15 text-orange-400 border-orange-500/30" },
+  FE:   { icon: Monitor,      cls: "bg-sky-500/15 text-sky-400 border-sky-500/30" },
+  BE:   { icon: Server,       cls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" },
+  DB:   { icon: Database,     cls: "bg-orange-500/15 text-orange-400 border-orange-500/30" },
   Test: { icon: FlaskConical, cls: "bg-purple-500/15 text-purple-400 border-purple-500/30" },
 };
 
 export function BreakdownScreen() {
+  const { data: planningData, loading: planningLoading } = useApiData("/api/data/planning", planningFallback);
   const { data: teamData, loading: teamLoading } = useApiData("/api/data/breakdown", teamFallback);
+
+  const [selectedId, setSelectedId] = useState<string>("");
   const [subtasks, setSubtasks] = useState<AssignedSubtask[]>([]);
   const [rationale, setRationale] = useState<{ person: string; text: string }[]>([]);
   const [decomposing, setDecomposing] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [streamText, setStreamText] = useState("");
 
+  const backlog = planningData.backlog;
+  const selectedTask = backlog.find((t) => t.id === selectedId) ?? null;
   const total = subtasks.reduce((sum, s) => sum + s.sp, 0);
+  const busy = decomposing || assigning;
 
-  const runDecompose = useCallback(async () => {
+  // Auto-select first task when backlog loads
+  useEffect(() => {
+    if (!selectedId && backlog.length > 0) setSelectedId(backlog[0].id);
+  }, [backlog, selectedId]);
+
+  const runDecompose = useCallback(async (task: BacklogTask) => {
     setDecomposing(true);
     setStreamText("");
     setSubtasks([]);
@@ -42,9 +55,9 @@ export function BreakdownScreen() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: "Implement Payment Flow",
-          description: "Full payment integration with UI, API, DB and tests",
-          totalSP: 8,
+          title: task.title,
+          description: task.rationale,
+          totalSP: task.aiSP || 5,
         }),
       });
 
@@ -92,26 +105,57 @@ export function BreakdownScreen() {
     }
   }, []);
 
-  // Auto-run AI breakdown on mount
+  // Auto-run when a task is selected
   useEffect(() => {
-    runDecompose();
-  }, [runDecompose]);
+    if (selectedTask) runDecompose(selectedTask);
+  }, [selectedTask?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const busy = decomposing || assigning;
+  const handleSelectChange = (id: string) => {
+    setSelectedId(id);
+    // runDecompose is triggered by the useEffect above when selectedTask changes
+  };
 
   return (
     <div className="space-y-6">
+      {/* Task selector */}
       <Card>
         <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
-          <div>
-            <div className="text-muted-foreground">Task</div>
-            <h2 className="tracking-tight">"Implement Payment Flow"</h2>
+          <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+            <span className="shrink-0 text-muted-foreground">Task</span>
+            {planningLoading && backlog.length === 0 ? (
+              <Skeleton className="h-9 w-full max-w-sm" />
+            ) : (
+              <Select value={selectedId} onValueChange={handleSelectChange} disabled={busy}>
+                <SelectTrigger className="w-full max-w-sm" data-testid="task-select">
+                  <SelectValue placeholder="Select a task…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {backlog.map((task) => {
+                    const Icon = task.type === "bug" ? Bug : BookOpen;
+                    return (
+                      <SelectItem key={task.id} value={task.id}>
+                        <div className="flex items-center gap-2">
+                          <Icon className={`h-3.5 w-3.5 shrink-0 ${task.type === "bug" ? "text-rose-500" : "text-sky-500"}`} />
+                          <span className="truncate">{task.title}</span>
+                          <span className="shrink-0 text-muted-foreground">· {task.aiSP} SP</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            )}
           </div>
+
           <div className="flex items-center gap-3">
             {!busy && subtasks.length > 0 && (
               <Badge variant="secondary" className="px-3 py-1">{total} SP total</Badge>
             )}
-            <Button onClick={runDecompose} disabled={busy} variant="outline">
+            <Button
+              variant="outline"
+              onClick={() => selectedTask && runDecompose(selectedTask)}
+              disabled={busy || !selectedTask}
+            >
               {busy
                 ? <><Loader2 className="h-4 w-4 animate-spin" />{assigning ? "Assigning…" : "Decomposing…"}</>
                 : <><RotateCcw className="h-4 w-4" /> Re-run</>}
@@ -120,6 +164,7 @@ export function BreakdownScreen() {
         </CardContent>
       </Card>
 
+      {/* Streaming preview */}
       {streamText && decomposing && (
         <Card>
           <CardHeader>
@@ -133,6 +178,7 @@ export function BreakdownScreen() {
         </Card>
       )}
 
+      {/* Sub-tasks table */}
       <Card>
         <CardHeader><CardTitle>Sub-tasks</CardTitle></CardHeader>
         <CardContent>
@@ -187,6 +233,7 @@ export function BreakdownScreen() {
         </CardContent>
       </Card>
 
+      {/* Rationale + Team Load */}
       <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
         <Card>
           <CardHeader>
@@ -199,7 +246,7 @@ export function BreakdownScreen() {
             {assigning && rationale.length === 0
               ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)
               : rationale.length === 0
-                ? <p className="text-sm text-muted-foreground italic">Assignment rationale will appear after decomposition.</p>
+                ? <p className="text-sm italic text-muted-foreground">Assignment rationale will appear after decomposition.</p>
                 : rationale.map((r, i) => (
                     <div key={i} className="rounded-md border border-border bg-muted/30 p-3">
                       <div className="text-indigo-400">{r.person}</div>
