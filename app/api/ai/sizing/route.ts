@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import Groq from "groq-sdk";
 
-const client = new Anthropic();
+const client = new Groq();
+const MODEL = "llama-3.3-70b-versatile";
 
 export async function POST(req: NextRequest) {
-  const { title, description, rationale, references } = await req.json();
+  const { title, description, references } = await req.json();
 
   try {
-    const message = await client.messages.create({
-      model: "claude-haiku-4-5-20251001",
+    const completion = await client.chat.completions.create({
+      model: MODEL,
       max_tokens: 512,
+      response_format: { type: "json_object" },
       messages: [
         {
           role: "user",
@@ -34,10 +36,9 @@ Respond ONLY with valid JSON, no markdown.`,
       ],
     });
 
-    const text = message.content[0].type === "text" ? message.content[0].text : "{}";
-    const result = JSON.parse(text);
-    return NextResponse.json(result);
-  } catch {
-    return NextResponse.json({ error: "AI unavailable" }, { status: 500 });
+    const text = completion.choices[0]?.message?.content ?? "{}";
+    return NextResponse.json(JSON.parse(text));
+  } catch (e) {
+    return NextResponse.json({ error: String(e) }, { status: 500 });
   }
 }

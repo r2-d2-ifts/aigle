@@ -1,20 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import Groq from "groq-sdk";
 import { getTeamLoad } from "@/lib/db";
 
-const client = new Anthropic();
+const client = new Groq();
+const MODEL = "llama-3.3-70b-versatile";
 
 export async function POST(req: NextRequest) {
   const { subtasks } = await req.json();
   const team = await getTeamLoad();
 
-  const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 768,
-    messages: [
-      {
-        role: "user",
-        content: `You are a Tech Lead assigning sub-tasks to team members.
+  try {
+    const completion = await client.chat.completions.create({
+      model: MODEL,
+      max_tokens: 768,
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "user",
+          content: `You are a Tech Lead assigning sub-tasks to team members.
 
 Sub-tasks to assign:
 ${JSON.stringify(subtasks, null, 2)}
@@ -27,31 +30,28 @@ Rules:
 - Prefer members with lower load
 - Consider domain history if available
 
-Respond with JSON array matching sub-tasks order:
-[
-  {
-    "assignee": "name",
-    "rationale": "brief reason: skill match + load + history"
+Respond with JSON: {"assignments": [{"assignee": "name", "rationale": "..."}]}
+The assignments array must match sub-tasks order. ONLY valid JSON.`,
+        },
+      ],
+    });
+
+    const text = completion.choices[0]?.message?.content ?? '{"assignments":[]}';
+    const parsed = JSON.parse(text);
+    const assignments: { assignee: string; rationale: string }[] = parsed.assignments ?? [];
+
+    const result = subtasks.map((s: { type: string; name: string }, i: number) => ({
+      ...s,
+      assignee: assignments[i]?.assignee ?? "TBD",
+    }));
+
+    const rationale = assignments.map((a, i) => ({
+      person: a.assignee,
+      text: `${subtasks[i]?.type}: ${a.rationale}`,
+    }));
+
+    return NextResponse.json({ subtasks: result, rationale });
+  } catch (e) {
+    return NextResponse.json({ error: String(e), subtasks, rationale: [] }, { status: 500 });
   }
-]
-
-ONLY valid JSON array, no markdown.`,
-      },
-    ],
-  });
-
-  const text = message.content[0].type === "text" ? message.content[0].text : "[]";
-  const assignments: { assignee: string; rationale: string }[] = JSON.parse(text);
-
-  const result = subtasks.map((s: { type: string; name: string }, i: number) => ({
-    ...s,
-    assignee: assignments[i]?.assignee ?? "TBD",
-  }));
-
-  const rationale = assignments.map((a, i) => ({
-    person: a.assignee,
-    text: `${subtasks[i]?.type}: ${a.rationale}`,
-  }));
-
-  return NextResponse.json({ subtasks: result, rationale });
 }

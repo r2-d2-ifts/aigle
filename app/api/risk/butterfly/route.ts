@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import Groq from "groq-sdk";
 
-const client = new Anthropic();
+const client = new Groq();
+const MODEL = "llama-3.3-70b-versatile";
 
 export async function POST(req: NextRequest) {
   const { blockedTask, sprintTasks } = await req.json();
 
-  const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 512,
-    messages: [
-      {
-        role: "user",
-        content: `You are a risk analyst. A task is blocked. Analyze downstream impact.
+  try {
+    const completion = await client.chat.completions.create({
+      model: MODEL,
+      max_tokens: 512,
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "user",
+          content: `You are a risk analyst. A task is blocked. Analyze downstream impact.
 
 Blocked task: ${blockedTask}
 Sprint tasks: ${JSON.stringify(sprintTasks ?? [])}
@@ -28,12 +31,14 @@ Respond with JSON:
   "mitigation": "brief suggestion"
 }
 
-Only valid JSON, no markdown.`,
-      },
-    ],
-  });
+ONLY valid JSON, no markdown.`,
+        },
+      ],
+    });
 
-  const text = message.content[0].type === "text" ? message.content[0].text : "{}";
-  const result = JSON.parse(text);
-  return NextResponse.json(result);
+    const text = completion.choices[0]?.message?.content ?? "{}";
+    return NextResponse.json(JSON.parse(text));
+  } catch (e) {
+    return NextResponse.json({ error: String(e), impactChain: [], healthDelta: 0, mitigation: "" }, { status: 500 });
+  }
 }

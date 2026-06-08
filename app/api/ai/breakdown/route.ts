@@ -1,14 +1,17 @@
 import { NextRequest } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import Groq from "groq-sdk";
 
-const client = new Anthropic();
+const client = new Groq();
+const MODEL = "llama-3.3-70b-versatile";
 
 export async function POST(req: NextRequest) {
   const { title, description, totalSP } = await req.json();
 
-  const stream = await client.messages.stream({
-    model: "claude-haiku-4-5-20251001",
+  const stream = await client.chat.completions.create({
+    model: MODEL,
     max_tokens: 1024,
+    stream: true,
+    response_format: { type: "json_object" },
     messages: [
       {
         role: "user",
@@ -19,19 +22,15 @@ Description: ${description ?? "Not provided"}
 Total estimated SP: ${totalSP ?? 8}
 
 Create 3-5 sub-tasks covering FE, BE, DB, Test layers as appropriate.
-Respond with JSON array:
-[
-  {
-    "type": "FE"|"BE"|"DB"|"Test",
-    "name": "short name",
-    "description": "1 sentence",
-    "sp": <number>,
-    "assignee": "TBD",
-    "dependencies": []
-  }
-]
+Respond with JSON object: { "subtasks": [...] } where each subtask has:
+  type: "FE"|"BE"|"DB"|"Test"
+  name: short name
+  description: 1 sentence
+  sp: number
+  assignee: "TBD"
+  dependencies: []
 
-Respond ONLY with a valid JSON array, no markdown.`,
+ONLY valid JSON, no markdown.`,
       },
     ],
   });
@@ -39,14 +38,21 @@ Respond ONLY with a valid JSON array, no markdown.`,
   const encoder = new TextEncoder();
   const readable = new ReadableStream({
     async start(controller) {
+      let buffer = "";
       for await (const chunk of stream) {
-        if (
-          chunk.type === "content_block_delta" &&
-          chunk.delta.type === "text_delta"
-        ) {
-          controller.enqueue(encoder.encode(chunk.delta.text));
+        const delta = chunk.choices[0]?.delta?.content;
+        if (delta) {
+          buffer += delta;
+          controller.enqueue(encoder.encode(delta));
         }
       }
+      // Reshape if model wrapped in {subtasks: [...]} — caller expects bare array
+      try {
+        const parsed = JSON.parse(buffer);
+        if (parsed.subtasks && Array.isArray(parsed.subtasks)) {
+          // No reshape mid-stream — client must parse and unwrap. Send marker.
+        }
+      } catch {}
       controller.close();
     },
   });

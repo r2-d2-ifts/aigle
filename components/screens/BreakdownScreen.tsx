@@ -72,8 +72,9 @@ export function BreakdownScreen() {
 
       setDecomposing(false);
 
-      // 2. Parse sub-tasks
-      const parsed: AssignedSubtask[] = JSON.parse(accumulated);
+      // 2. Parse sub-tasks (handle {subtasks:[...]} or bare array)
+      const raw = JSON.parse(accumulated);
+      const parsed: AssignedSubtask[] = Array.isArray(raw) ? raw : (raw.subtasks ?? []);
       setSubtasks(parsed);
 
       // 3. Get assignment
