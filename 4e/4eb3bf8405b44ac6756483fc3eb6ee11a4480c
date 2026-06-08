@@ -1,0 +1,21 @@
+components/layout/AppShell.tsx
+  s_e489c18f864c57::t_c82c9bc7573225 3,8-18
+components/layout/TopBar.tsx
+  s_e489c18f864c57::t_3da94da411e7fb 28-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "4e4eb3bf8405b44ac6756483fc3eb6ee11a4480c",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
