@@ -65,7 +65,7 @@ export function HealthScreen() {
         <h2 className="tracking-tight">Score & Risk</h2>
       </div>
 
-      <HealthScoreGauge score={displayScore} />
+      <HealthScoreGauge score={displayScore} factors={data.healthFactors} />
 
       <Card>
         <CardHeader><CardTitle>Butterfly Effect Simulator</CardTitle></CardHeader>

@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { healthColor, healthLabel } from "@/lib/mockData";
+import { healthColor, healthLabel } from "@/lib/utils";
 
 type Props = { score: number };
 

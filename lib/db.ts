@@ -159,7 +159,7 @@ export async function insertSubtasks(rows: object[]) {
 }
 
 export async function upsertTeamMembers(rows: object[]) {
-  return supabase.from("team_members").upsert(rows, { onConflict: "name" });
+  return supabase.from("team_members").insert(rows);
 }
 
 export async function upsertSprintHealth(rows: object[]) {
