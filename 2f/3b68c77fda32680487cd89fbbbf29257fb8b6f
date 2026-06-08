@@ -1,0 +1,48 @@
+components/screens/DashboardScreen.tsx
+  s_e489c18f864c57::t_39f7e6af547349 17-20
+lib/db.ts
+  s_e489c18f864c57::t_e4a01e1cf10df3 1-2,4,6,11-15,24-27,31-36,47,53,67-76,79,83-84,91-105,111-115,126,129-131,137,140-143,147
+app/api/data/health/route.ts
+  s_e489c18f864c57::t_3cac55eadbf780 2,5-10
+components/screens/PlanningScreen.tsx
+  s_e489c18f864c57::t_4c8bd1ddf10ae3 10,21-24,28
+  s_e489c18f864c57::t_7bf43b25647000 34-39
+  s_e489c18f864c57::t_dcdbb206a987e0 43
+components/layout/TopBar.tsx
+  s_e489c18f864c57::t_9f69d09f6f4df6 9,11
+  s_e489c18f864c57::t_e84713f887a289 15
+app/api/jira/sprints/route.ts
+  s_e489c18f864c57::t_03d5e42f1524aa 2,5-6
+components/screens/ReviewScreen.tsx
+  s_e489c18f864c57::t_8fce191358fd70 13-16
+components/screens/HealthScreen.tsx
+  s_e489c18f864c57::t_894852f20112c8 3
+  s_e489c18f864c57::t_9da945d8cd77ec 13-18
+  s_e489c18f864c57::t_3e008aca231d0d 24-27
+  s_e489c18f864c57::t_54e35706195e45 22
+app/api/seed/route.ts
+  s_e489c18f864c57::t_9d27b9c219ef28 7
+app/api/jira/import/route.ts
+  s_e489c18f864c57::t_15763b41ca1445 2
+components/screens/BreakdownScreen.tsx
+  s_e489c18f864c57::t_781422e63e7eaf 86-87
+  s_e489c18f864c57::t_c38b4b274470e9 10,12-16
+app/api/jira/backlog/route.ts
+  s_e489c18f864c57::t_a967cbe0fc8535 3-4,7-11,13,16-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "2f3b68c77fda32680487cd89fbbbf29257fb8b6f",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
