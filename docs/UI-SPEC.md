@@ -1,4 +1,4 @@
-# AgileMind AI — UI Specification
+# aigle — UI Specification
 
 **Project:** AI-Powered Agile Manager | Hackathon MVP  
 **Stack hint:** Next.js 15 + Tailwind | Single-user demo tool
@@ -19,7 +19,7 @@
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  AgileMind AI              Sprint: [selector ▾]   [⚙ Config] │
+│  aigle              Sprint: [selector ▾]   [⚙ Config] │
 ├────────────┬─────────────────────────────────────────────────┤
 │            │                                                  │
 │  Sidebar   │              Main Content                        │

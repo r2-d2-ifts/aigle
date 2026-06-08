@@ -1,6 +1,6 @@
-# ROADMAP: AgileMind AI
+# ROADMAP: aigle
 
-**Project:** AgileMind AI — AI-powered Agile Manager (IFTS Hackathon 2026)
+**Project:** aigle — AI-powered Agile Manager (IFTS Hackathon 2026)
 **Granularity:** Coarse (3 phases)
 **Coverage:** 21/21 v1 requirements mapped
 **Created:** 2026-06-08

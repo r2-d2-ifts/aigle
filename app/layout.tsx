@@ -4,7 +4,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AgileMind AI",
+  title: "aigle",
   description: "AI-Powered Agile Manager",
 };
 

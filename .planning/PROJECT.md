@@ -1,8 +1,8 @@
-# AgileMind AI
+# aigle
 
 ## What This Is
 
-AgileMind AI is an AI-powered Agile Manager that reads Jira (read-only) and automates the cognitive overhead of Scrum ceremonies. It provides predictive story point estimation with quality gating, automatic task decomposition with skill-based assignment, sprint dashboards, AI-generated review narratives, and a blocker impact simulator — freeing development teams to focus on coding instead of process management.
+aigle is an AI-powered Agile Manager that reads Jira (read-only) and automates the cognitive overhead of Scrum ceremonies. It provides predictive story point estimation with quality gating, automatic task decomposition with skill-based assignment, sprint dashboards, AI-generated review narratives, and a blocker impact simulator — freeing development teams to focus on coding instead of process management.
 
 Built for the IFTS AI Hackathon 2026 as a Next.js 15 + Claude API application.
 

@@ -1,4 +1,4 @@
-# AgileMind AI – Advanced Feature Specs
+# aigle – Advanced Feature Specs
 IFTS AI Hackathon 2026 – Spec Pack v2
 
 ## 1. Amaç ve Vizyon
@@ -11,7 +11,7 @@ Takımların sprint kalitesini düşüren 4 kritik problem:
 - Atamaların sadece kapasiteye göre yapılması (bağlam eksikliği)
 
 ### 1.2 Çözüm Vizyonu
-Bu doküman, AgileMind AI için jüri etkisi yüksek 4 yeni AI özelliğini tanımlar:
+Bu doküman, aigle için jüri etkisi yüksek 4 yeni AI özelliğini tanımlar:
 - Anti-Bullshit Filtresi
 - Roast My Sprint
 - Kelebek Etkisi Simülatörü
@@ -164,7 +164,7 @@ Yüzeysel atama yerine takım hafızasını simüle eden daha “gerçekçi lide
 
 ## 10. Sonuç
 
-Bu 4 özellik ile AgileMind AI,
+Bu 4 özellik ile aigle,
 **sadece raporlayan bir araçtan**,  
 **kalite kontrol eden, öngören ve bağlamsal karar veren bir AI Agile Manager’a** dönüşür.
 '@ | Set-Content -Path "C:\Users\TCSBESDAS\IdeaProjects\hcktoon\aigle\command\spec2.md" -Encoding utf8

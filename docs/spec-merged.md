@@ -1,4 +1,4 @@
-# AgileMind AI – Full Feature Specification
+# aigle – Full Feature Specification
 IFTS AI Hackathon 2026 – Canonical Spec (spec.md + spec2.md merged)
 
 ---
@@ -18,7 +18,7 @@ Bu durum geliştiricilerin **kod geliştirmek yerine süreç yönetimiyle vakit 
 
 ### 1.2 Solution Vision
 
-**AgileMind AI**, Jira verilerini **sadece okuyarak**:
+**aigle**, Jira verilerini **sadece okuyarak**:
 
 - Sprint planlamayı tahminler ile destekleyen
 - Yetersiz task tanımlarını kalite kapısında reddeden

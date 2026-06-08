@@ -1,4 +1,4 @@
--- AgileMind AI — Supabase Schema
+-- aigle — Supabase Schema
 -- Run this in Supabase SQL Editor: supabase.com > SQL Editor > New query
 
 -- Sprints

@@ -1,4 +1,4 @@
-# AgileMind AI – AI Powered Agile Manager
+# aigle – AI Powered Agile Manager
 IFTS AI Hackathon 2026 – MVP Specification
 
 ## 1. Amaç ve Vizyon
@@ -12,7 +12,7 @@ Geleneksel Scrum/Kanban süreçlerinde:
 Bu durum geliştiricilerin **kod geliştirmek yerine süreç yönetimiyle vakit kaybetmesine** neden olur.
 
 ### 1.2 Çözüm Vizyonu
-**AgileMind AI**, Jira verilerini **sadece okuyarak**:
+**aigle**, Jira verilerini **sadece okuyarak**:
 - Sprint planlamayı tahminler ile destekleyen
 - Task’ları otomatik teknik alt görevlere bölen
 - Sprint sonunda otomatik, anlatılabilir bir review üreten  
@@ -264,7 +264,7 @@ LLM Provider
 
 ## 12. Sonuç
 
-AgileMind AI, Scrum/Kanban süreçlerindeki
+aigle, Scrum/Kanban süreçlerindeki
 **bürokratik yükü minimize eden**,  
 **veriye dayalı kararlar sunan**,  
 **AI-first bir Agile Manager MVP’sidir.**

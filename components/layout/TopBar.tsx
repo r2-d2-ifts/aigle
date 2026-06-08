@@ -55,7 +55,7 @@ export function TopBar() {
         <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
           <Sparkles className="h-4 w-4" />
         </div>
-        <span className="tracking-tight">AgileMind AI</span>
+        <span className="tracking-tight">aigle</span>
       </div>
 
       <div className="flex items-center gap-2">

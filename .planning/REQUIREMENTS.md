@@ -1,4 +1,4 @@
-# Requirements: AgileMind AI
+# Requirements: aigle
 
 **Defined:** 2026-06-08
 **Core Value:** AI replaces Scrum Master cognitive load — quality gate → sizing → decomposition → assignment → review, all explainable

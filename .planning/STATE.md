@@ -1,4 +1,4 @@
-# STATE: AgileMind AI
+# STATE: aigle
 
 **Last updated:** 2026-06-08
 **Milestone:** 1 (MVP — Hackathon build) ✅ COMPLETE
