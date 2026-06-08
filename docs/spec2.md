@@ -1,4 +1,3 @@
-@'
 # AgileMind AI – Advanced Feature Specs
 IFTS AI Hackathon 2026 – Spec Pack v2
 
