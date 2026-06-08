@@ -1,22 +1,59 @@
 "use client";
 
 import { useState } from "react";
-import { Play, ArrowDown, Lightbulb } from "lucide-react";
+import { Play, ArrowDown, Lightbulb, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { HealthScoreGauge } from "@/components/HealthScoreGauge";
 import { useApiData } from "@/hooks/useApiData";
-import { blockableTasks as mockTasks, impactChain as mockChain, healthScore as mockScore, healthFactors as mockFactors } from "@/lib/mockData";
+import {
+  blockableTasks as mockTasks,
+  impactChain as mockChain,
+  healthScore as mockScore,
+  healthFactors as mockFactors,
+} from "@/lib/mockData";
+
+type ImpactNode = { level: number; status: "blocked" | "risk" | "ok"; label: string; detail: string };
 
 const fallback = { healthScore: mockScore, healthFactors: mockFactors, blockableTasks: mockTasks, impactChain: mockChain };
 
 export function HealthScreen() {
   const { data } = useApiData("/api/data/health", fallback);
   const [taskId, setTaskId] = useState(data.blockableTasks[0]?.id ?? "db1");
-  const [simulated, setSimulated] = useState(false);
+  const [simulating, setSimulating] = useState(false);
+  const [simResult, setSimResult] = useState<{
+    impactChain: ImpactNode[];
+    healthDelta: number;
+    mitigation: string;
+  } | null>(null);
 
-  const newScore = simulated ? Math.max(0, data.healthScore - 17) : data.healthScore;
+  const displayScore = simResult
+    ? Math.max(0, data.healthScore + simResult.healthDelta)
+    : data.healthScore;
+
+  const handleSimulate = async () => {
+    setSimulating(true);
+    setSimResult(null);
+    const blocked = data.blockableTasks.find((t) => t.id === taskId);
+    try {
+      const res = await fetch("/api/risk/butterfly", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blockedTask: blocked?.name ?? taskId, sprintTasks: data.blockableTasks }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setSimResult(json);
+      }
+    } catch {
+      setSimResult({ impactChain: data.impactChain, healthDelta: -17, mitigation: "Parallelize FE with mock API; unblock DB schema review by EOD." });
+    } finally {
+      setSimulating(false);
+    }
+  };
+
+  const chain = simResult?.impactChain ?? data.impactChain;
 
   return (
     <div className="space-y-6">
@@ -25,7 +62,7 @@ export function HealthScreen() {
         <h2 className="tracking-tight">Score & Risk</h2>
       </div>
 
-      <HealthScoreGauge score={newScore} />
+      <HealthScoreGauge score={displayScore} />
 
       <Card>
         <CardHeader><CardTitle>Butterfly Effect Simulator</CardTitle></CardHeader>
@@ -40,14 +77,20 @@ export function HealthScreen() {
                 ))}
               </SelectContent>
             </Select>
-            <Button onClick={() => setSimulated(true)}><Play className="h-4 w-4" /> Simulate Impact</Button>
-            {simulated && <Button variant="ghost" onClick={() => setSimulated(false)}>Reset</Button>}
+            <Button onClick={handleSimulate} disabled={simulating}>
+              {simulating
+                ? <><Loader2 className="h-4 w-4 animate-spin" /> Simulating…</>
+                : <><Play className="h-4 w-4" /> Simulate Impact</>}
+            </Button>
+            {simResult && (
+              <Button variant="ghost" onClick={() => setSimResult(null)}>Reset</Button>
+            )}
           </div>
 
-          {simulated && (
+          {simResult && (
             <div className="rounded-lg border border-border bg-muted/30 p-4">
               <div className="space-y-2">
-                {data.impactChain.map((node, i) => {
+                {chain.map((node, i) => {
                   const dot = node.status === "blocked" ? "bg-rose-500" : node.status === "risk" ? "bg-amber-500" : "bg-emerald-500";
                   return (
                     <div key={i}>
@@ -56,7 +99,7 @@ export function HealthScreen() {
                         <span>{node.label}</span>
                         {node.detail && <span className="text-muted-foreground">— {node.detail}</span>}
                       </div>
-                      {i < data.impactChain.length - 1 && (
+                      {i < chain.length - 1 && (
                         <ArrowDown className="my-1 h-3 w-3 text-muted-foreground" style={{ marginLeft: node.level * 24 + 4 }} />
                       )}
                     </div>
@@ -68,8 +111,8 @@ export function HealthScreen() {
                 <span>Health Score</span>
                 <span>
                   <span className="text-muted-foreground">{data.healthScore}</span> →{" "}
-                  <span className="text-rose-400">{newScore}</span>{" "}
-                  <span className="text-rose-400">(-17)</span>
+                  <span className="text-rose-400">{displayScore}</span>{" "}
+                  <span className="text-rose-400">({simResult.healthDelta})</span>
                 </span>
               </div>
 
@@ -77,7 +120,7 @@ export function HealthScreen() {
                 <Lightbulb className="mt-0.5 h-4 w-4 text-indigo-400" />
                 <div>
                   <div>Mitigation</div>
-                  <div className="text-muted-foreground">Parallelize FE with mock API; unblock DB schema review by EOD.</div>
+                  <div className="text-muted-foreground">{simResult.mitigation}</div>
                 </div>
               </div>
             </div>

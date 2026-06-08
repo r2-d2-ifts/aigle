@@ -8,7 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MetricCard } from "@/components/MetricCard";
 import { RoastModal } from "@/components/RoastModal";
 import { useApiData } from "@/hooks/useApiData";
-import { plannedVsDone as mockPlannedVsDone, reviewNarrative, healthScore as mockHealthScore, healthFactors as mockHealthFactors } from "@/lib/mockData";
+import {
+  plannedVsDone as mockPlannedVsDone,
+  healthScore as mockHealthScore,
+  healthFactors as mockHealthFactors,
+} from "@/lib/mockData";
 
 const fallback = {
   velocityTrend: [],
@@ -19,14 +23,33 @@ const fallback = {
 
 export function ReviewScreen() {
   const { data } = useApiData("/api/data/dashboard", fallback);
-  const [narrative, setNarrative] = useState<string | null>(reviewNarrative);
+  const [narrative, setNarrative] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [roastOpen, setRoastOpen] = useState(false);
 
-  const regenerate = () => {
-    setNarrative(null);
+  const generateReview = async () => {
+    setNarrative("");
     setLoading(true);
-    setTimeout(() => { setNarrative(reviewNarrative); setLoading(false); }, 900);
+    try {
+      const res = await fetch("/api/ai/review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planned: 24, done: 21, spillover: "13%", blockers: 2, sprintName: "Sprint 14" }),
+      });
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          setNarrative((prev) => prev + decoder.decode(value, { stream: true }));
+        }
+      }
+    } catch {
+      setNarrative("Sprint review generation failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -36,7 +59,9 @@ export function ReviewScreen() {
           <div className="text-muted-foreground">Retrospective</div>
           <h2 className="tracking-tight">Sprint 14 Review</h2>
         </div>
-        <Button onClick={regenerate}><Sparkles className="h-4 w-4" /> Generate Review</Button>
+        <Button onClick={generateReview} disabled={loading}>
+          <Sparkles className="h-4 w-4" /> {loading ? "Generating…" : "Generate Review"}
+        </Button>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
@@ -74,19 +99,26 @@ export function ReviewScreen() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {loading || !narrative ? (
+          {loading && !narrative ? (
             <div className="space-y-2">
               <div className="h-3 w-full animate-pulse rounded bg-muted" />
               <div className="h-3 w-11/12 animate-pulse rounded bg-muted" />
               <div className="h-3 w-9/12 animate-pulse rounded bg-muted" />
             </div>
-          ) : (
+          ) : narrative ? (
             <p className="leading-relaxed">{narrative}</p>
+          ) : (
+            <p className="text-muted-foreground italic">Click "Generate Review" to produce an AI sprint summary.</p>
           )}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled={!narrative}><Copy className="h-4 w-4" /> Copy</Button>
-              <Button variant="outline" size="sm" disabled={!narrative}><Download className="h-4 w-4" /> Export</Button>
+              <Button variant="outline" size="sm" disabled={!narrative}
+                onClick={() => navigator.clipboard?.writeText(narrative)}>
+                <Copy className="h-4 w-4" /> Copy
+              </Button>
+              <Button variant="outline" size="sm" disabled={!narrative}>
+                <Download className="h-4 w-4" /> Export
+              </Button>
             </div>
             <Button variant="destructive" onClick={() => setRoastOpen(true)}>
               <Flame className="h-4 w-4" /> Roast My Sprint
