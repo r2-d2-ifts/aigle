@@ -1,0 +1,19 @@
+docs/UI-SPEC.md
+  s_e489c18f864c57::t_7cd43ac547224a 1-276
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "baff3adf7e6ea6841feae6f506ebb95b4cbecb55",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
