@@ -1,0 +1,49 @@
+components/screens/PlanningScreen.tsx
+  s_e489c18f864c57::t_3ba1a4e4086fda 82-85
+  s_e489c18f864c57::t_c61c12ec2ffe5c 4-5,11,24-29,36,39,42-44,47,53-55,64,70,73-81,86-88,90-109,112,125,133-140,145,165-177,179-184,186-193,195-205,207-209,212-216,218-261,263-279,287
+  s_e489c18f864c57::t_69ea5298c7d834 67-68
+components/HealthScoreGauge.tsx
+  s_e489c18f864c57::t_1da79205a09f42 45,47
+  s_e489c18f864c57::t_a2ebd6e7445917 7
+components/RoastModal.tsx
+  s_e489c18f864c57::t_c87b960503799c 51-62
+app/api/ai/assignment/route.ts
+  s_e489c18f864c57::t_b064057bedd520 8-9,20
+docs/spec-merged.md
+  s_e489c18f864c57::t_707d12011cc6cd 263-264
+app/api/ai/review/route.ts
+  s_e489c18f864c57::t_aeb62b9849a85e 7-8,14,17,20-33,35-36,38
+app/api/risk/butterfly/route.ts
+  s_e489c18f864c57::t_e9aa1b5a002cec 7-8,18
+app/api/sprint/add/route.ts
+  s_e489c18f864c57::t_ea6fca13f93ac3 1-25
+components/screens/ReviewScreen.tsx
+  s_e489c18f864c57::t_f57e3997433eaa 107-120
+  s_e489c18f864c57::t_cc2aed141d3665 130-139
+lib/db.ts
+  s_e489c18f864c57::t_cd987d9dafacdc 129-131,133,143-146
+app/api/ai/blocker-risk/route.ts
+  s_e489c18f864c57::t_f4919272097ecf 1-53
+app/api/ai/breakdown/route.ts
+  s_e489c18f864c57::t_a6e3f8bef4e64f 7-8,18
+app/api/ai/sizing/route.ts
+  s_e489c18f864c57::t_e9fde0957752a3 7-8,18
+app/api/ai/roast/route.ts
+  s_e489c18f864c57::t_042c6430a802f7 7-8,17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "e22371d15a682cf9f36edd0e7cfdfa624726291d",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
