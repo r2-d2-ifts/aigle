@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { getBacklog, getSprints, isConfigured } from "@/lib/jiraClient";
 import { upsertSprints, upsertTasks } from "@/lib/db";
+import { wipeAll } from "@/lib/wipe";
 
 export async function POST() {
   if (!isConfigured()) {
     return NextResponse.json({ error: "Jira not configured — check JIRA_* env vars" }, { status: 400 });
   }
+
+  // Wipe ALL data first — Jira is source of truth
+  await wipeAll();
 
   const errors: string[] = [];
   let sprintCount = 0;
@@ -20,7 +24,7 @@ export async function POST() {
     if (jiraSprints.length) {
       const rows = jiraSprints.map((s: Record<string, unknown>) => ({
         id: String(s.id),
-        name: (s.fields as Record<string, unknown>)?.summary ?? `Sprint ${s.id}`,
+        name: ((s.fields as Record<string, unknown>)?.summary as string) ?? `Sprint ${s.id}`,
         jira_id: String(s.id),
         status: "active",
       }));
@@ -51,7 +55,7 @@ export async function POST() {
   }
 
   return NextResponse.json({
-    ok: true,
+    ok: errors.length === 0,
     imported: { sprints: sprintCount, tasks: taskCount },
     errors: errors.length ? errors : undefined,
   });
