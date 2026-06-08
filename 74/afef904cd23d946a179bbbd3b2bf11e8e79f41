@@ -1,0 +1,45 @@
+.planning/ROADMAP.md
+  s_e489c18f864c57::t_248819ea8cebe6 64-66
+  s_e489c18f864c57::t_dbb00c15e9c57b 12-14
+scripts/seed.mjs
+  s_e489c18f864c57::t_a08f8ba004e85a 81
+  s_e489c18f864c57::t_0694d52c7a5523 1-80,82-91
+.planning/STATE.md
+  s_e489c18f864c57::t_56927b03f1a926 4,12,14,20-21,24-27,37,39,43,45-50,52-55,57-62,66,68-74,77
+app/api/ai/review/route.ts
+  s_e489c18f864c57::t_a5f7458ebc7b98 9-15,23-25,27-32,34-37,39
+lib/utils.ts
+  s_e489c18f864c57::t_01fc4989299a68 7-18
+components/screens/HealthScreen.tsx
+  s_e489c18f864c57::t_c21f7511cad620 68
+components/HealthScoreBadge.tsx
+  s_e489c18f864c57::t_8f4c3f434d69e6 2
+app/api/ai/assignment/route.ts
+  s_e489c18f864c57::t_396fad09cf0b0d 9,11-17,39-41,43-44,46-49,51-54,56
+app/api/ai/roast/route.ts
+  s_e489c18f864c57::t_152188a2353f2a 9-15,22-24,26-27
+lib/db.ts
+  s_e489c18f864c57::t_0772a51ccfe21f 162
+app/api/risk/butterfly/route.ts
+  s_e489c18f864c57::t_5dab39bb86b827 9-15,25,32-34,36-38
+components/HealthScoreGauge.tsx
+  s_e489c18f864c57::t_537672ea6b1018 5,7-8,10,30-32,44-45,47
+components/RoastModal.tsx
+  s_e489c18f864c57::t_6103d030412e2d 6,11,16,24-25,34,41-42,44,47-48,51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "74afef904cd23d946a179bbbd3b2bf11e8e79f41",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
