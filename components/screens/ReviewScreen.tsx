@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MetricCard } from "@/components/MetricCard";
 import { RoastModal } from "@/components/RoastModal";
+import { TeamsButton } from "@/components/TeamsButton";
 import { useApiData } from "@/hooks/useApiData";
 
 const fallback = {
@@ -127,6 +128,14 @@ export function ReviewScreen() {
                 onClick={() => navigator.clipboard?.writeText(narrative)}>
                 <Copy className="h-4 w-4" /> Copy
               </Button>
+              {narrative && (
+                <TeamsButton
+                  title="📋 Sprint 14 Review"
+                  text={narrative}
+                  color="accent"
+                  label="Send to Teams"
+                />
+              )}
               <Button
                 variant="outline" size="sm" disabled={!narrative}
                 onClick={() => {

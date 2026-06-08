@@ -4,9 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 next dev",
+    "dev:lan": "NODE_TLS_REJECT_UNAUTHORIZED=0 next dev -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "node --env-file=.env.local scripts/seed.mjs",
+    "create-users": "node --env-file=.env.local scripts/create-users.mjs",
+    "teams:test": "node --env-file=.env.local scripts/teams-test.mjs",
+    "teams:panel": "node --env-file=.env.local scripts/post-control-panel.mjs",
+    "pa-cards": "node scripts/generate-pa-cards.mjs"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
