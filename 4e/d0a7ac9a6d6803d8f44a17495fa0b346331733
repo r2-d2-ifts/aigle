@@ -1,0 +1,32 @@
+docs/ARCHITECTURE.md
+  s_e489c18f864c57::t_b11f5c89b1f7fe 10,14-16,18,25-31
+  s_e489c18f864c57::t_1837a5442c7b6e 127,130-131
+  s_e489c18f864c57::t_55cad76a6a54ce 5
+  s_e489c18f864c57::t_3bf09622f9c4f9 104-112
+README.md
+  s_e489c18f864c57::t_ee091d2cb0d4dc 37-38
+  s_e489c18f864c57::t_a8bee348c78b9e 133-157
+  s_e489c18f864c57::t_fad2ab7cee961f 103,105,107-109
+  s_e489c18f864c57::t_4c562a881dfd68 89,91,94
+.planning/PROJECT.md
+  s_e489c18f864c57::t_2951ab2c742fcc 32-39,45
+  s_e489c18f864c57::t_66f2fcf765768c 7
+.planning/REQUIREMENTS.md
+  s_e489c18f864c57::t_eca2c4f8833ffb 51-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "4ed0a7ac9a6d6803d8f44a17495fa0b346331733",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
