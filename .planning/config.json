@@ -1,4 +1,6 @@
 {
+  "mode": "yolo",
+  "granularity": "coarse",
   "model_profile": "balanced",
   "commit_docs": true,
   "workflow": {
