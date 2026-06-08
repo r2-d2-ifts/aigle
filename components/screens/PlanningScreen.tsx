@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Search, Bug, BookOpen, CheckCircle2, XCircle, Sparkles, Plus } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Search, Bug, BookOpen, CheckCircle2, XCircle, Sparkles, Plus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,16 +9,64 @@ import { Badge } from "@/components/ui/badge";
 import { useApiData } from "@/hooks/useApiData";
 import { backlog as mockBacklog, type BacklogTask } from "@/lib/mockData";
 
+type AISizing = {
+  passes: boolean;
+  aiSP?: number;
+  confidence?: number;
+  references?: number;
+  rationale?: string;
+  rejectReason?: string;
+};
+
 const fallback = { backlog: mockBacklog, sprints: [] };
 
 export function PlanningScreen() {
   const { data } = useApiData("/api/data/planning", fallback);
   const [selectedId, setSelectedId] = useState<string>(mockBacklog[0].id);
   const [query, setQuery] = useState("");
+  const [sizing, setSizing] = useState<Record<string, AISizing>>({});
+  const [sizingLoading, setSizingLoading] = useState(false);
 
   const backlog = data.backlog;
   const selected = backlog.find((t) => t.id === selectedId) ?? backlog[0];
   const filtered = backlog.filter((t) => t.title.toLowerCase().includes(query.toLowerCase()));
+
+  const runSizing = useCallback(async (task: BacklogTask) => {
+    if (sizing[task.id]) return; // already fetched
+    setSizingLoading(true);
+    try {
+      const res = await fetch("/api/ai/sizing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: task.title,
+          description: task.rationale,
+          references: task.references,
+        }),
+      });
+      if (res.ok) {
+        const result: AISizing = await res.json();
+        setSizing((prev) => ({ ...prev, [task.id]: result }));
+      }
+    } catch {
+      // Keep mock data on failure
+    } finally {
+      setSizingLoading(false);
+    }
+  }, [sizing]);
+
+  useEffect(() => {
+    if (selected) runSizing(selected);
+  }, [selected, runSizing]);
+
+  // Merge AI sizing with task data (AI overrides mock when available)
+  const ai = sizing[selected?.id ?? ""];
+  const passes = ai ? ai.passes : (selected?.passes ?? true);
+  const aiSP = ai?.aiSP ?? selected?.aiSP ?? 0;
+  const confidence = ai?.confidence ?? selected?.confidence ?? 0;
+  const references = ai?.references ?? selected?.references ?? 0;
+  const rationale = ai?.rationale ?? selected?.rationale ?? "";
+  const rejectReason = ai?.rejectReason ?? selected?.rejectReason;
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
@@ -38,7 +86,13 @@ export function PlanningScreen() {
 
         <div className="space-y-3">
           {filtered.map((task) => (
-            <TaskRow key={task.id} task={task} active={task.id === selectedId} onSelect={() => setSelectedId(task.id)} />
+            <TaskRow
+              key={task.id}
+              task={task}
+              aiResult={sizing[task.id]}
+              active={task.id === selectedId}
+              onSelect={() => setSelectedId(task.id)}
+            />
           ))}
         </div>
       </div>
@@ -47,7 +101,9 @@ export function PlanningScreen() {
         <Card className="sticky top-4 h-fit">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-indigo-500" /> AI Sizing
+              <Sparkles className="h-4 w-4 text-indigo-500" />
+              AI Sizing
+              {sizingLoading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -56,41 +112,53 @@ export function PlanningScreen() {
               <div className="tracking-tight">"{selected.title}"</div>
             </div>
 
-            <div className="rounded-lg border border-border bg-muted/30 p-4">
-              <div className="text-muted-foreground">Suggested</div>
-              <div className="tracking-tight" style={{ fontSize: 36, lineHeight: 1 }}>
-                {selected.aiSP} <span className="text-muted-foreground" style={{ fontSize: 14 }}>SP</span>
+            {sizingLoading && !ai ? (
+              <div className="space-y-2">
+                <div className="h-16 animate-pulse rounded-lg bg-muted" />
+                <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+                <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
               </div>
-            </div>
-
-            <div>
-              <div className="mb-1 flex items-center justify-between">
-                <span className="text-muted-foreground">Confidence</span>
-                <span>{selected.confidence}%</span>
-              </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  className={selected.confidence >= 75 ? "h-full bg-emerald-500" : selected.confidence >= 50 ? "h-full bg-amber-500" : "h-full bg-rose-500"}
-                  style={{ width: `${selected.confidence}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-muted-foreground">
-              <span>References</span><span>{selected.references}</span>
-            </div>
-
-            <blockquote className="border-l-2 border-indigo-500 pl-3 italic text-muted-foreground">
-              "{selected.rationale}"
-            </blockquote>
-
-            {selected.passes ? (
-              <Button className="w-full"><Plus className="h-4 w-4" /> Add to Sprint</Button>
             ) : (
-              <div className="rounded-md border border-rose-500/40 bg-rose-500/10 p-3 text-rose-400">
-                <div className="flex items-center gap-2"><XCircle className="h-4 w-4" /> Anti-Bullshit gate rejected</div>
-                <div className="mt-1 text-muted-foreground">{selected.rejectReason}</div>
-              </div>
+              <>
+                <div className="rounded-lg border border-border bg-muted/30 p-4">
+                  <div className="text-muted-foreground">Suggested</div>
+                  <div className="tracking-tight" style={{ fontSize: 36, lineHeight: 1 }}>
+                    {aiSP} <span className="text-muted-foreground" style={{ fontSize: 14 }}>SP</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="text-muted-foreground">Confidence</span>
+                    <span>{confidence}%</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                    <div
+                      className={confidence >= 75 ? "h-full bg-emerald-500" : confidence >= 50 ? "h-full bg-amber-500" : "h-full bg-rose-500"}
+                      style={{ width: `${confidence}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-muted-foreground">
+                  <span>References</span><span>{references}</span>
+                </div>
+
+                {rationale && (
+                  <blockquote className="border-l-2 border-indigo-500 pl-3 italic text-muted-foreground">
+                    "{rationale}"
+                  </blockquote>
+                )}
+
+                {passes ? (
+                  <Button className="w-full"><Plus className="h-4 w-4" /> Add to Sprint</Button>
+                ) : (
+                  <div className="rounded-md border border-rose-500/40 bg-rose-500/10 p-3 text-rose-400">
+                    <div className="flex items-center gap-2"><XCircle className="h-4 w-4" /> Anti-Bullshit gate rejected</div>
+                    <div className="mt-1 text-muted-foreground">{rejectReason}</div>
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>
@@ -99,8 +167,18 @@ export function PlanningScreen() {
   );
 }
 
-function TaskRow({ task, active, onSelect }: { task: BacklogTask; active: boolean; onSelect: () => void }) {
+function TaskRow({
+  task, aiResult, active, onSelect,
+}: {
+  task: BacklogTask;
+  aiResult?: AISizing;
+  active: boolean;
+  onSelect: () => void;
+}) {
   const Icon = task.type === "bug" ? Bug : BookOpen;
+  const passes = aiResult ? aiResult.passes : task.passes;
+  const aiSP = aiResult?.aiSP ?? task.aiSP;
+
   return (
     <button
       onClick={onSelect}
@@ -114,13 +192,13 @@ function TaskRow({ task, active, onSelect }: { task: BacklogTask; active: boolea
             <div className="mt-1 flex items-center gap-2 text-muted-foreground">
               <span>Current: {task.currentSP ?? "?"} SP</span>
               <span>·</span>
-              <Badge variant="secondary">AI: {task.aiSP} SP</Badge>
+              <Badge variant="secondary">AI: {aiSP} SP</Badge>
             </div>
           </div>
         </div>
-        {task.passes ? <CheckCircle2 className="h-5 w-5 text-emerald-500" /> : <XCircle className="h-5 w-5 text-rose-500" />}
+        {passes ? <CheckCircle2 className="h-5 w-5 text-emerald-500" /> : <XCircle className="h-5 w-5 text-rose-500" />}
       </div>
-      {!task.passes && <div className="mt-2 text-rose-400">⛔ {task.rejectReason}</div>}
+      {!passes && <div className="mt-2 text-rose-400">⛔ {aiResult?.rejectReason ?? task.rejectReason}</div>}
     </button>
   );
 }

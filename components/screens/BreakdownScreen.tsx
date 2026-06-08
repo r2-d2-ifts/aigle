@@ -1,14 +1,22 @@
 "use client";
 
-import { Monitor, Server, Database, FlaskConical, Play, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Monitor, Server, Database, FlaskConical, Play, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useApiData } from "@/hooks/useApiData";
-import { subtasks as mockSubtasks, assignmentRationale as mockRationale, teamLoad as mockTeamLoad } from "@/lib/mockData";
+import {
+  subtasks as mockSubtasks,
+  assignmentRationale as mockRationale,
+  teamLoad as mockTeamLoad,
+  type Subtask,
+} from "@/lib/mockData";
 
 const fallback = { subtasks: mockSubtasks, assignmentRationale: mockRationale, teamLoad: mockTeamLoad };
+
+type AssignedSubtask = Subtask & { description?: string; dependencies?: string[] };
 
 const typeStyle: Record<string, { icon: typeof Monitor; cls: string }> = {
   FE: { icon: Monitor, cls: "bg-sky-500/15 text-sky-400 border-sky-500/30" },
@@ -19,8 +27,72 @@ const typeStyle: Record<string, { icon: typeof Monitor; cls: string }> = {
 
 export function BreakdownScreen() {
   const { data } = useApiData("/api/data/breakdown", fallback);
-  const { subtasks, assignmentRationale, teamLoad } = data;
+  const [subtasks, setSubtasks] = useState<AssignedSubtask[]>(data.subtasks);
+  const [rationale, setRationale] = useState(data.assignmentRationale);
+  const [decomposing, setDecomposing] = useState(false);
+  const [assigning, setAssigning] = useState(false);
+  const [streamText, setStreamText] = useState("");
+
+  const { teamLoad } = data;
   const total = subtasks.reduce((sum, s) => sum + s.sp, 0);
+
+  const handleDecompose = async () => {
+    setDecomposing(true);
+    setStreamText("");
+    setSubtasks([]);
+    setRationale([]);
+
+    try {
+      // 1. Stream decomposition
+      const res = await fetch("/api/ai/breakdown", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: "Implement Payment Flow", description: "Full payment integration with UI, API, DB and tests", totalSP: 8 }),
+      });
+
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let accumulated = "";
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          accumulated += chunk;
+          setStreamText(accumulated);
+        }
+      }
+
+      setDecomposing(false);
+
+      // 2. Parse sub-tasks
+      const parsed: AssignedSubtask[] = JSON.parse(accumulated);
+      setSubtasks(parsed);
+
+      // 3. Get assignment
+      setAssigning(true);
+      const assignRes = await fetch("/api/ai/assignment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subtasks: parsed }),
+      });
+
+      if (assignRes.ok) {
+        const { subtasks: assigned, rationale: newRationale } = await assignRes.json();
+        setSubtasks(assigned);
+        setRationale(newRationale);
+      }
+    } catch {
+      // Restore mock on error
+      setSubtasks(data.subtasks);
+      setRationale(data.assignmentRationale);
+    } finally {
+      setDecomposing(false);
+      setAssigning(false);
+      setStreamText("");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -32,10 +104,23 @@ export function BreakdownScreen() {
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="secondary" className="px-3 py-1">{total} SP total</Badge>
-            <Button><Play className="h-4 w-4" /> Decompose</Button>
+            <Button onClick={handleDecompose} disabled={decomposing || assigning}>
+              {decomposing || assigning
+                ? <><Loader2 className="h-4 w-4 animate-spin" />{assigning ? "Assigning…" : "Decomposing…"}</>
+                : <><Play className="h-4 w-4" /> Decompose</>}
+            </Button>
           </div>
         </CardContent>
       </Card>
+
+      {streamText && decomposing && (
+        <Card>
+          <CardHeader><CardTitle className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin text-indigo-500" /> Generating sub-tasks…</CardTitle></CardHeader>
+          <CardContent>
+            <pre className="whitespace-pre-wrap font-mono text-xs text-muted-foreground">{streamText}</pre>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader><CardTitle>Sub-tasks</CardTitle></CardHeader>
@@ -60,9 +145,12 @@ export function BreakdownScreen() {
                         <Icon className="h-3.5 w-3.5" /> {s.type}
                       </span>
                     </TableCell>
-                    <TableCell>{s.name}</TableCell>
+                    <TableCell>
+                      <div>{s.name}</div>
+                      {s.description && <div className="text-xs text-muted-foreground">{s.description}</div>}
+                    </TableCell>
                     <TableCell>{s.sp}</TableCell>
-                    <TableCell>{s.assignee}</TableCell>
+                    <TableCell>{s.assignee ?? <span className="text-muted-foreground">TBD</span>}</TableCell>
                   </TableRow>
                 );
               })}
@@ -76,10 +164,11 @@ export function BreakdownScreen() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-indigo-500" /> Assignment Rationale
+              {assigning && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {assignmentRationale.map((r) => (
+            {rationale.map((r) => (
               <div key={r.person} className="rounded-md border border-border bg-muted/30 p-3">
                 <div className="text-indigo-400">{r.person}</div>
                 <div className="text-muted-foreground">{r.text}</div>
