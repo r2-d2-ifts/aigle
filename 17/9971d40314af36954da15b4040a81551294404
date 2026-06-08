@@ -1,0 +1,40 @@
+docs/teams-integration.md
+  s_e489c18f864c57::t_fc29e343abd8b5 1-86
+components/screens/ReviewScreen.tsx
+  s_e489c18f864c57::t_591cacb96a390a 131-138
+  s_e489c18f864c57::t_cff0c0aec8a4ae 11
+package.json
+  s_e489c18f864c57::t_e566b2495201a7 7,10-15
+middleware.ts
+  s_e489c18f864c57::t_f1e8c6cffc5bc9 4
+scripts/post-control-panel.mjs
+  s_e489c18f864c57::t_84ee9e2eb4cb19 1-46
+components/TeamsButton.tsx
+  s_e489c18f864c57::t_4eeb35e35afa2a 1-50
+lib/teams.ts
+  s_e489c18f864c57::t_8cc5c1919d819c 1-68
+scripts/generate-pa-cards.mjs
+  s_e489c18f864c57::t_3364254a29cfab 1-62
+app/api/teams-query/route.ts
+  s_e489c18f864c57::t_d21ac26058b228 1-86
+app/api/teams-notify/route.ts
+  s_e489c18f864c57::t_199caad48bb2d5 1-15
+scripts/teams-test.mjs
+  s_e489c18f864c57::t_7eb8f0a104d3ba 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "179971d40314af36954da15b4040a81551294404",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
