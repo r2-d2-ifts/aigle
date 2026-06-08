@@ -1,4 +1,4 @@
-export type Sprint = { id: string; name: string; range: string };
+import type { Sprint, BacklogTask, Subtask } from "./types";
 
 export const sprints: Sprint[] = [
   { id: "s10", name: "Sprint 10", range: "Mar 3 – Mar 14" },
@@ -21,19 +21,6 @@ export const plannedVsDone = [
   { name: "Bugs", Planned: 5, Done: 5 },
   { name: "Tech Debt", Planned: 3, Done: 2 },
 ];
-
-export type BacklogTask = {
-  id: string;
-  title: string;
-  type: "story" | "bug";
-  currentSP: number | null;
-  aiSP: number;
-  confidence: number;
-  references: number;
-  rationale: string;
-  passes: boolean;
-  rejectReason?: string;
-};
 
 export const backlog: BacklogTask[] = [
   {
@@ -94,13 +81,6 @@ export const backlog: BacklogTask[] = [
   },
 ];
 
-export type Subtask = {
-  type: "FE" | "BE" | "DB" | "Test";
-  name: string;
-  sp: number;
-  assignee: string;
-};
-
 export const subtasks: Subtask[] = [
   { type: "FE", name: "Payment UI form", sp: 2, assignee: "Ayşe" },
   { type: "BE", name: "Payment API", sp: 3, assignee: "Mehmet" },
@@ -109,18 +89,9 @@ export const subtasks: Subtask[] = [
 ];
 
 export const assignmentRationale = [
-  {
-    person: "Ayşe",
-    text: "FE: 2 similar FE tasks last sprint, load 40%, skill match: React ✓",
-  },
-  {
-    person: "Mehmet",
-    text: "BE+DB: ödeme modülü 3 sprint geçmişi, load 55%, skill match: FastAPI ✓",
-  },
-  {
-    person: "Can",
-    text: "Test: Playwright sahibi, load 30%, daha önce ödeme regresyonunu kurdu.",
-  },
+  { person: "Ayşe", text: "FE: 2 similar FE tasks last sprint, load 40%, skill match: React ✓" },
+  { person: "Mehmet", text: "BE+DB: ödeme modülü 3 sprint geçmişi, load 55%, skill match: FastAPI ✓" },
+  { person: "Can", text: "Test: Playwright sahibi, load 30%, daha önce ödeme regresyonunu kurdu." },
 ];
 
 export const teamLoad = [
@@ -154,15 +125,3 @@ export const impactChain = [
   { level: 1, status: "risk" as const, label: "BE payment API", detail: "risk 70%, +2 days" },
   { level: 2, status: "risk" as const, label: "FE payment UI", detail: "risk 40%, +3 days" },
 ];
-
-export function healthColor(score: number) {
-  if (score >= 75) return "emerald";
-  if (score >= 50) return "amber";
-  return "rose";
-}
-
-export function healthLabel(score: number) {
-  if (score >= 75) return "Good";
-  if (score >= 50) return "Warning";
-  return "Critical";
-}

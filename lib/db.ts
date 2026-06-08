@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import type { BacklogTask, Subtask, Sprint } from "./mockData";
+import type { BacklogTask, Subtask, Sprint } from "./types";
 
 // ── Sprints ───────────────────────────────────────────────────────────────────
 

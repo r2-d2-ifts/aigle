@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApiData } from "@/hooks/useApiData";
-import type { Subtask } from "@/lib/mockData";
+import type { Subtask } from "@/lib/types";
 
 const fallback = {
   subtasks: [] as Subtask[],
@@ -33,7 +33,6 @@ export function BreakdownScreen() {
   const [assigning, setAssigning] = useState(false);
   const [streamText, setStreamText] = useState("");
 
-  // Sync server data into local state when it loads
   useEffect(() => {
     if (data.subtasks.length > 0 && subtasks.length === 0) setSubtasks(data.subtasks);
     if (data.assignmentRationale.length > 0 && rationale.length === 0) setRationale(data.assignmentRationale);

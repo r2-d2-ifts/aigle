@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useApiData } from "@/hooks/useApiData";
-import type { BacklogTask, Sprint } from "@/lib/mockData";
+import type { BacklogTask, Sprint } from "@/lib/types";
 
 type AISizing = {
   passes: boolean;

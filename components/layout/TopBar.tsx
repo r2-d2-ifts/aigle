@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useApiData } from "@/hooks/useApiData";
-import type { Sprint } from "@/lib/mockData";
+import type { Sprint } from "@/lib/types";
 
 const fallback = { sprints: [] as Sprint[], backlog: [] };
 
