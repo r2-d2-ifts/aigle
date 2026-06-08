@@ -1,11 +1,15 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
-const client = new Groq();
 const MODEL = "llama-3.3-70b-versatile";
 
 export async function POST(req: NextRequest) {
+  if (!process.env.GROQ_API_KEY) {
+    return NextResponse.json({ error: "GROQ_API_KEY not configured." }, { status: 503 });
+  }
+
   const { planned, done, spillover, blockers, sprintName } = await req.json();
+  const client = new Groq();
 
   const stream = await client.chat.completions.create({
     model: MODEL,

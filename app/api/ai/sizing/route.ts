@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
-const client = new Groq();
 const MODEL = "llama-3.3-70b-versatile";
 
 export async function POST(req: NextRequest) {
+  if (!process.env.GROQ_API_KEY) {
+    return NextResponse.json({
+      passes: true,
+      confidence: 0,
+      references: 0,
+      rationale: "GROQ_API_KEY not configured. Add it to .env.local to enable AI sizing.",
+    });
+  }
+
   const { title, description, references } = await req.json();
+  const client = new Groq();
 
   try {
     const completion = await client.chat.completions.create({
