@@ -25,6 +25,10 @@ export function TopBar() {
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => setEmail(user?.email ?? null));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setEmail(session?.user?.email ?? null);
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleLogout = async () => {
