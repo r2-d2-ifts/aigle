@@ -4,7 +4,7 @@
 
 aigle is an AI-powered Agile Manager that reads Jira (read-only) and automates the cognitive overhead of Scrum ceremonies. It provides predictive story point estimation with quality gating, automatic task decomposition with skill-based assignment, sprint dashboards, AI-generated review narratives, and a blocker impact simulator — freeing development teams to focus on coding instead of process management.
 
-Built for the IFTS AI Hackathon 2026 as a Next.js 15 + Claude API application.
+Built for the IFTS AI Hackathon 2026 as a Next.js 15 + Groq LLM application backed by Supabase (Postgres + Auth) with Microsoft Teams Adaptive Card integration.
 
 ## Core Value
 
@@ -29,13 +29,20 @@ AI replaces the Scrum Master's cognitive load: quality gate → predictive sizin
 - [ ] Butterfly Effect simulator: downstream impact when task is blocked
 - [ ] Sprint Health Score (1–100) with factor breakdown
 
+### Validated (post-hackathon additions)
+
+- ✓ Supabase Postgres state — replaced in-memory mock
+- ✓ Supabase Auth (email/password) — middleware-enforced session
+- ✓ Groq llama-3.3-70b-versatile — replaced Claude
+- ✓ Microsoft Teams Workflows integration — Adaptive Cards both directions
+- ✓ Blocker Risk AI — predicts probability + causes + mitigations
+
 ### Out of Scope
 
 - Jira write-back — hackathon constraint; demo safety
 - Multi-team / multi-project — MVP focus
-- User authentication — single-user demo tool
-- Production database — in-memory + JSON only
 - Real-time WebSocket — polling or on-demand sufficient
+- Role-based access control — auth is binary (signed-in or not)
 
 ## Context
 

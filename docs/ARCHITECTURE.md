@@ -2,27 +2,33 @@
 
 ## Overview
 
-aigle is a single Next.js 15 (App Router) application with three external boundaries: **Jira REST** (read-only), **Supabase Postgres** (state), and **Groq LLM** (inference). All UI is server-rendered React with client islands for interactive screens. Streaming is used for AI endpoints that produce long-form output.
+aigle is a single Next.js 15 (App Router) application with five external boundaries: **Jira REST** (read-only), **Supabase Postgres** (state), **Supabase Auth** (cookie sessions), **Groq LLM** (inference), and **Microsoft Teams Workflows** (Adaptive Card webhooks). All UI is server-rendered React with client islands for interactive screens. Streaming is used for AI endpoints that produce long-form output.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                        Browser                               │
-│  /planning  /breakdown  /review  /risk  /  (Dashboard)       │
+│  /login    /  /planning  /breakdown  /review  /risk          │
 └───────────────┬──────────────────────────────────────────────┘
                 │ fetch / SSE
 ┌───────────────▼──────────────────────────────────────────────┐
+│      middleware.ts — Supabase Auth gate (cookie session)     │
+│      public: /login, /api/auth, /api/teams-*                 │
+├──────────────────────────────────────────────────────────────┤
 │                Next.js App Router (server)                   │
+│  app/api/auth/*    ←  signOut                                │
 │  app/api/data/*    ←  read state from Postgres               │
 │  app/api/jira/*    ←  read Jira, wipe + load Postgres        │
 │  app/api/seed      ←  demo seed (wipe + load)                │
 │  app/api/sprint/*  ←  mutate sprint                          │
 │  app/api/ai/*      ←  Groq calls (streaming where useful)    │
 │  app/api/risk/*    ←  butterfly simulation                   │
-└──────┬────────────────────────┬─────────────────┬────────────┘
-       │                        │                 │
-       ▼                        ▼                 ▼
-   Supabase                Jira REST            Groq
-   Postgres                  v2                 llama-3.3-70b-versatile
+│  app/api/teams-*   ←  Adaptive Card push + query callbacks   │
+└──┬───────────┬──────────┬─────────────┬──────────────┬───────┘
+   │           │          │             │              │
+   ▼           ▼          ▼             ▼              ▼
+Supabase   Supabase    Jira REST      Groq         MS Teams
+Postgres     Auth         v2          llama-3.3    Workflows
+(state)    (sessions)               -70b-versatile  webhook
 ```
 
 ## Module Map
@@ -95,7 +101,15 @@ Pure compute against Postgres-stored task graph + history — no LLM call.
 
 - **Server state**: Supabase Postgres only. Schema in `supabase/schema.sql`.
 - **Client state**: React local state. No global store; screens are largely independent.
-- **No auth**: single-user demo tool.
+- **Auth**: Supabase Auth (email/password) via `@supabase/ssr`. Cookie sessions, enforced by `middleware.ts`. `/login` is the only unauthenticated route. TopBar reacts to `onAuthStateChange` so logout/email updates without page reload. AppShell hides chrome (TopBar + Sidebar) on `/login` via `usePathname`.
+
+## Teams Integration
+
+Adaptive Card flow in two directions over a single `TEAMS_WEBHOOK_URL`:
+
+- **App → Teams** — `lib/teams.ts` builds cards, `/api/teams-notify` POSTs them. UI exposes "Send to Teams" buttons (e.g. Review screen forwards the AI narrative).
+- **Teams → App (live)** — `scripts/post-control-panel.mjs` posts a sticky panel whose buttons hit `/api/teams-query?type=…`, which returns an HTML ack and pushes a fresh data card back to the channel.
+- **Teams → App (Power Automate)** — `scripts/generate-pa-cards.mjs` emits static card JSONs for PA flows that branch on `/komut` messages.
 
 ## Streaming
 
@@ -110,9 +124,11 @@ Both use the Groq SDK's `stream: true` mode and forward the response body direct
 | Failure | Behavior |
 |---------|----------|
 | `GROQ_API_KEY` missing | AI routes return empty defaults; UI shows "AI disabled" |
-| Jira unreachable / 401 | Falls back to `lib/mockData.ts` so the demo always works |
+| Jira unreachable / 401 | Jira import surfaces error; reads serve Supabase state |
 | Supabase down | Read endpoints return 500; UI shows error toast |
 | LLM returns invalid JSON | Server returns 500; client retries once |
+| `TEAMS_WEBHOOK_URL` missing | `/api/teams-*` return 503; UI shows "Teams not configured" toast |
+| Supabase Auth session expired | `middleware.ts` redirects to `/login?next=<path>` |
 
 ## Conventions
 

@@ -34,7 +34,8 @@ aigle replaces a Scrum Master's manual workload with explainable AI:
 | Animation | motion + canvas-confetti |
 | LLM | Groq SDK — `llama-3.3-70b-versatile` (streaming) |
 | Data | Supabase (Postgres) via `@supabase/supabase-js` |
-| Integration | Jira REST API v2 (read-only) |
+| Auth | Supabase Auth via `@supabase/ssr` (cookie sessions, middleware-guarded routes) |
+| Integration | Jira REST API v2 (read-only), Microsoft Teams Workflows (Adaptive Cards) |
 
 ---
 
@@ -85,10 +86,12 @@ See [`.env.example`](./.env.example) for the full list. Required at minimum:
 |----------|---------|
 | `GROQ_API_KEY` | LLM calls (sizing, breakdown, assignment, review, roast, butterfly, blocker-risk) |
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client + server Supabase access |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-side mutations (seed, Jira import) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-side mutations (seed, Jira import, user admin) |
 | `JIRA_SERVER`, `JIRA_LOGIN`, `JIRA_API_TOKEN`, `JIRA_PROJECT` | Optional — enables real Jira import |
+| `TEAMS_WEBHOOK_URL` | Optional — Microsoft Teams Workflows incoming webhook for sharing review/roast/dashboard cards |
 
 Without `GROQ_API_KEY`, AI routes return empty/safe defaults instead of crashing.
+Without `TEAMS_WEBHOOK_URL`, the "Send to Teams" button returns HTTP 503 with a clear toast.
 
 ---
 
@@ -97,10 +100,13 @@ Without `GROQ_API_KEY`, AI routes return empty/safe defaults instead of crashing
 | Route | Screen |
 |-------|--------|
 | `/` | Dashboard — velocity, spillover, sprint health |
-| `/planning` | Sprint planning — backlog, sizing, quality gate |
+| `/planning` | Sprint planning — backlog, sizing, quality gate, blocker risk |
 | `/breakdown` | Task decomposition + smart assignment |
-| `/review` | AI sprint review narrative + Roast |
+| `/review` | AI sprint review narrative + Roast + Send to Teams |
 | `/risk` | Butterfly Effect blocker simulator |
+| `/login` | Sign-in / Sign-up (Supabase Auth) — chrome hidden here |
+
+All routes except `/login`, `/api/auth/*`, and `/api/teams-*` require an authenticated session (enforced by `middleware.ts`).
 
 ## API Routes
 
@@ -124,6 +130,31 @@ All under `app/api/`:
 | POST   | `/api/ai/roast` | Roast My Sprint critique |
 | POST   | `/api/ai/blocker-risk` | Blocker risk prediction |
 | POST   | `/api/risk/butterfly` | Downstream impact simulation |
+| POST   | `/api/auth/logout` | Server-side session signOut |
+| POST   | `/api/teams-notify` | Send any Adaptive Card to Teams webhook |
+| GET    | `/api/teams-query` | Teams button callback → live data card |
+
+## Authentication
+
+Supabase Auth (email + password) via `@supabase/ssr` cookie sessions.
+
+```bash
+# Pre-confirmed accounts for the 4 team members
+npm run create-users
+# Default password: Test1234
+```
+
+`/login` is the only unauthenticated route. `middleware.ts` redirects everything else (except `/api/auth/*` and `/api/teams-*`) to `/login?next=<path>` when no session is present.
+
+## Microsoft Teams Integration
+
+Adaptive Cards in both directions via a Teams Workflows incoming webhook. See [`docs/teams-integration.md`](./docs/teams-integration.md).
+
+```bash
+npm run teams:test                                 # smoke test → HTTP 202
+npm run teams:panel https://your-tunnel.ngrok.io   # post sticky control panel
+npm run pa-cards                                   # generate Power Automate cards
+```
 
 ---
 

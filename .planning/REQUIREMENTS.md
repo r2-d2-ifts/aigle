@@ -48,6 +48,30 @@
 
 ---
 
+### Authentication (AUTH)
+
+- [x] **AUTH-01**: Users sign in via email + password (Supabase Auth)
+- [x] **AUTH-02**: All app routes except `/login`, `/api/auth/*`, and `/api/teams-*` require active session (enforced by middleware)
+- [x] **AUTH-03**: TopBar shows signed-in email + logout button, reactive to `onAuthStateChange`
+- [x] **AUTH-04**: Sign-up flow creates a Supabase Auth user; admin script `scripts/create-users.mjs` seeds 4 team accounts with `email_confirm: true`
+
+### Blocker Risk (RISK-BONUS)
+
+- [x] **BRISK-01**: AI predicts blocker probability % for a selected task based on description patterns
+- [x] **BRISK-02**: Output includes 2-3 top causes with per-cause probability and Turkish reasoning
+- [x] **BRISK-03**: Output includes actionable mitigation suggestions
+- [x] **BRISK-04**: PlanningScreen renders Blocker Risk panel alongside AI Sizing
+
+### Teams Integration (TEAMS)
+
+- [x] **TEAMS-01**: `/api/teams-notify` POST sends any Adaptive Card to the configured Teams Workflows webhook
+- [x] **TEAMS-02**: Review screen has "Send to Teams" button that forwards the AI sprint review narrative
+- [x] **TEAMS-03**: `/api/teams-query?type=summary|sprint|tasks|team` returns HTML ack and pushes live-data card to channel
+- [x] **TEAMS-04**: `scripts/post-control-panel.mjs` posts a sticky 4-button Control Panel card
+- [x] **TEAMS-05**: `scripts/generate-pa-cards.mjs` emits static card JSONs for Power Automate command-bot flows
+
+---
+
 ## v2 Requirements
 
 ### Integrations
