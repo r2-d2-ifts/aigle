@@ -101,12 +101,12 @@ test.describe("Breakdown /breakdown", () => {
     expect(errors).toHaveLength(0);
   });
 
-  test("loads subtasks from Supabase on mount", async ({ page }) => {
+  test("auto-runs AI breakdown on mount and shows subtasks", async ({ page }) => {
     await page.goto("/breakdown");
-    await waitForData(page);
 
-    // Should not show "No sub-tasks yet" if Supabase has data
-    await expect(page.getByText(/No sub-tasks yet/i)).not.toBeVisible({ timeout: 8000 });
+    // AI pipeline runs automatically — wait for skeleton to disappear and rows to appear
+    await expect(page.getByText(/No sub-tasks generated/i)).not.toBeVisible({ timeout: 30000 });
+    await expect(page.locator("tbody tr").first()).toBeVisible({ timeout: 30000 });
     const rows = await page.locator("tbody tr").count();
     expect(rows).toBeGreaterThan(0);
   });

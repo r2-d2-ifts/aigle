@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Monitor, Server, Database, FlaskConical, Play, Sparkles, Loader2 } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Monitor, Server, Database, FlaskConical, RotateCcw, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,11 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useApiData } from "@/hooks/useApiData";
 import type { Subtask } from "@/lib/types";
 
-const fallback = {
-  subtasks: [] as Subtask[],
-  assignmentRationale: [] as { person: string; text: string }[],
-  teamLoad: [] as { name: string; load: number }[],
-};
+const teamFallback = { teamLoad: [] as { name: string; load: number }[] };
 
 type AssignedSubtask = Subtask & { description?: string; dependencies?: string[] };
 
@@ -26,33 +22,30 @@ const typeStyle: Record<string, { icon: typeof Monitor; cls: string }> = {
 };
 
 export function BreakdownScreen() {
-  const { data, loading } = useApiData("/api/data/breakdown", fallback);
+  const { data: teamData, loading: teamLoading } = useApiData("/api/data/breakdown", teamFallback);
   const [subtasks, setSubtasks] = useState<AssignedSubtask[]>([]);
   const [rationale, setRationale] = useState<{ person: string; text: string }[]>([]);
   const [decomposing, setDecomposing] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [streamText, setStreamText] = useState("");
 
-  useEffect(() => {
-    if (data.subtasks.length > 0 && subtasks.length === 0) setSubtasks(data.subtasks);
-    if (data.assignmentRationale.length > 0 && rationale.length === 0) setRationale(data.assignmentRationale);
-  }, [data.subtasks, data.assignmentRationale, subtasks.length, rationale.length]);
-
-  const { teamLoad } = data;
   const total = subtasks.reduce((sum, s) => sum + s.sp, 0);
 
-  const handleDecompose = async () => {
+  const runDecompose = useCallback(async () => {
     setDecomposing(true);
     setStreamText("");
     setSubtasks([]);
     setRationale([]);
 
     try {
-      // 1. Stream decomposition
       const res = await fetch("/api/ai/breakdown", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: "Implement Payment Flow", description: "Full payment integration with UI, API, DB and tests", totalSP: 8 }),
+        body: JSON.stringify({
+          title: "Implement Payment Flow",
+          description: "Full payment integration with UI, API, DB and tests",
+          totalSP: 8,
+        }),
       });
 
       const reader = res.body?.getReader();
@@ -71,12 +64,12 @@ export function BreakdownScreen() {
 
       setDecomposing(false);
 
-      // 2. Parse sub-tasks (handle {subtasks:[...]} or bare array)
       const raw = JSON.parse(accumulated);
       const parsed: AssignedSubtask[] = Array.isArray(raw) ? raw : (raw.subtasks ?? []);
       setSubtasks(parsed);
 
-      // 3. Get assignment
+      if (parsed.length === 0) return;
+
       setAssigning(true);
       const assignRes = await fetch("/api/ai/assignment", {
         method: "POST",
@@ -97,7 +90,14 @@ export function BreakdownScreen() {
       setAssigning(false);
       setStreamText("");
     }
-  };
+  }, []);
+
+  // Auto-run AI breakdown on mount
+  useEffect(() => {
+    runDecompose();
+  }, [runDecompose]);
+
+  const busy = decomposing || assigning;
 
   return (
     <div className="space-y-6">
@@ -108,11 +108,13 @@ export function BreakdownScreen() {
             <h2 className="tracking-tight">"Implement Payment Flow"</h2>
           </div>
           <div className="flex items-center gap-3">
-            <Badge variant="secondary" className="px-3 py-1">{total} SP total</Badge>
-            <Button onClick={handleDecompose} disabled={decomposing || assigning}>
-              {decomposing || assigning
+            {!busy && subtasks.length > 0 && (
+              <Badge variant="secondary" className="px-3 py-1">{total} SP total</Badge>
+            )}
+            <Button onClick={runDecompose} disabled={busy} variant="outline">
+              {busy
                 ? <><Loader2 className="h-4 w-4 animate-spin" />{assigning ? "Assigning…" : "Decomposing…"}</>
-                : <><Play className="h-4 w-4" /> Decompose</>}
+                : <><RotateCcw className="h-4 w-4" /> Re-run</>}
             </Button>
           </div>
         </CardContent>
@@ -120,7 +122,11 @@ export function BreakdownScreen() {
 
       {streamText && decomposing && (
         <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin text-indigo-500" /> Generating sub-tasks…</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin text-indigo-500" /> Generating sub-tasks…
+            </CardTitle>
+          </CardHeader>
           <CardContent>
             <pre className="whitespace-pre-wrap font-mono text-xs text-muted-foreground">{streamText}</pre>
           </CardContent>
@@ -140,7 +146,7 @@ export function BreakdownScreen() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading && subtasks.length === 0 ? (
+              {decomposing || (busy && subtasks.length === 0) ? (
                 Array.from({ length: 4 }).map((_, i) => (
                   <TableRow key={i}>
                     <TableCell><Skeleton className="h-6 w-16" /></TableCell>
@@ -152,7 +158,7 @@ export function BreakdownScreen() {
               ) : subtasks.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
-                    No sub-tasks yet. Click "Decompose" to generate.
+                    No sub-tasks generated.
                   </TableCell>
                 </TableRow>
               ) : (
@@ -190,21 +196,25 @@ export function BreakdownScreen() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {rationale.map((r) => (
-              <div key={r.person} className="rounded-md border border-border bg-muted/30 p-3">
-                <div className="text-indigo-400">{r.person}</div>
-                <div className="text-muted-foreground">{r.text}</div>
-              </div>
-            ))}
+            {assigning && rationale.length === 0
+              ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-16 w-full" />)
+              : rationale.length === 0
+                ? <p className="text-sm text-muted-foreground italic">Assignment rationale will appear after decomposition.</p>
+                : rationale.map((r, i) => (
+                    <div key={i} className="rounded-md border border-border bg-muted/30 p-3">
+                      <div className="text-indigo-400">{r.person}</div>
+                      <div className="text-muted-foreground">{r.text}</div>
+                    </div>
+                  ))}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader><CardTitle>Team Load</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            {loading && teamLoad.length === 0
+            {teamLoading && teamData.teamLoad.length === 0
               ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)
-              : teamLoad.map((p) => (
+              : teamData.teamLoad.map((p) => (
                 <div key={p.name}>
                   <div className="mb-1 flex items-center justify-between">
                     <span>{p.name}</span>
