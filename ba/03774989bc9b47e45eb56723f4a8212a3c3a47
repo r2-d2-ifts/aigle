@@ -1,0 +1,23 @@
+supabase/schema.sql
+  s_e489c18f864c57::t_91eab36bb4280f 55,61-62
+scripts/seed.mjs
+  s_e489c18f864c57::t_3c719606b804e1 137
+  s_e489c18f864c57::t_7f99ac53d2c4ca 20,24-28,31-35,38-42,45-49,53-91,94-98,101-103,106-109,112,149,153-155,157,160,163
+  s_e489c18f864c57::t_9cf2ff4f22889b 134-136,138-146,156
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "ba03774989bc9b47e45eb56723f4a8212a3c3a47",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}

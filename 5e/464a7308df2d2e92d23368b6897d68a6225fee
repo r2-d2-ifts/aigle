@@ -1,0 +1,27 @@
+lib/seedData.mjs
+  s_e489c18f864c57::t_8a761a711f7eaa 1-74
+lib/wipe.ts
+  s_e489c18f864c57::t_0cc4b8c30b54d4 1-11
+app/api/jira/import/route.ts
+  s_e489c18f864c57::t_399568d2c53309 4,11-13,27,58
+app/api/seed/route.ts
+  s_e489c18f864c57::t_20cc283f1e5fa1 3-13,16,19-21,23-27,32-36
+scripts/seed.mjs
+  s_e489c18f864c57::t_51113a8bfe112a 2,25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "5e464a7308df2d2e92d23368b6897d68a6225fee",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
