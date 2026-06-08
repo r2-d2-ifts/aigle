@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useApiData } from "@/hooks/useApiData";
 import type { BacklogTask, Sprint } from "@/lib/mockData";
 
@@ -24,7 +25,7 @@ const fallback = {
 };
 
 export function PlanningScreen() {
-  const { data } = useApiData("/api/data/planning", fallback);
+  const { data, loading } = useApiData("/api/data/planning", fallback);
   const [selectedId, setSelectedId] = useState<string>("");
   const [query, setQuery] = useState("");
   const [sizing, setSizing] = useState<Record<string, AISizing>>({});
@@ -93,15 +94,25 @@ export function PlanningScreen() {
         </div>
 
         <div className="space-y-3">
-          {filtered.map((task) => (
-            <TaskRow
-              key={task.id}
-              task={task}
-              aiResult={sizing[task.id]}
-              active={task.id === selectedId}
-              onSelect={() => setSelectedId(task.id)}
-            />
-          ))}
+          {loading && filtered.length === 0 ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-20 w-full" />
+            ))
+          ) : filtered.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted-foreground">
+              No backlog tasks. Click "Load Test Data" or "Import from Jira".
+            </div>
+          ) : (
+            filtered.map((task) => (
+              <TaskRow
+                key={task.id}
+                task={task}
+                aiResult={sizing[task.id]}
+                active={task.id === selectedId}
+                onSelect={() => setSelectedId(task.id)}
+              />
+            ))
+          )}
         </div>
       </div>
 

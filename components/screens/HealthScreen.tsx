@@ -5,6 +5,7 @@ import { Play, ArrowDown, Lightbulb, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { HealthScoreGauge } from "@/components/HealthScoreGauge";
 import { useApiData } from "@/hooks/useApiData";
 
@@ -18,7 +19,7 @@ const fallback = {
 };
 
 export function HealthScreen() {
-  const { data } = useApiData("/api/data/health", fallback);
+  const { data, loading } = useApiData("/api/data/health", fallback);
   const [taskId, setTaskId] = useState<string>("");
   const [simulating, setSimulating] = useState(false);
 
@@ -65,7 +66,7 @@ export function HealthScreen() {
         <h2 className="tracking-tight">Score & Risk</h2>
       </div>
 
-      <HealthScoreGauge score={displayScore} factors={data.healthFactors} />
+      {loading ? <Skeleton className="h-[220px] w-full" /> : <HealthScoreGauge score={displayScore} factors={data.healthFactors} />}
 
       <Card>
         <CardHeader><CardTitle>Butterfly Effect Simulator</CardTitle></CardHeader>

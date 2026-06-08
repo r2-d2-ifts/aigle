@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Monitor, Server, Database, FlaskConical, Play, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useApiData } from "@/hooks/useApiData";
 import type { Subtask } from "@/lib/mockData";
 
@@ -25,12 +26,18 @@ const typeStyle: Record<string, { icon: typeof Monitor; cls: string }> = {
 };
 
 export function BreakdownScreen() {
-  const { data } = useApiData("/api/data/breakdown", fallback);
-  const [subtasks, setSubtasks] = useState<AssignedSubtask[]>(data.subtasks);
-  const [rationale, setRationale] = useState(data.assignmentRationale);
+  const { data, loading } = useApiData("/api/data/breakdown", fallback);
+  const [subtasks, setSubtasks] = useState<AssignedSubtask[]>([]);
+  const [rationale, setRationale] = useState<{ person: string; text: string }[]>([]);
   const [decomposing, setDecomposing] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [streamText, setStreamText] = useState("");
+
+  // Sync server data into local state when it loads
+  useEffect(() => {
+    if (data.subtasks.length > 0 && subtasks.length === 0) setSubtasks(data.subtasks);
+    if (data.assignmentRationale.length > 0 && rationale.length === 0) setRationale(data.assignmentRationale);
+  }, [data.subtasks, data.assignmentRationale, subtasks.length, rationale.length]);
 
   const { teamLoad } = data;
   const total = subtasks.reduce((sum, s) => sum + s.sp, 0);
@@ -133,25 +140,42 @@ export function BreakdownScreen() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {subtasks.map((s, i) => {
-                const meta = typeStyle[s.type] ?? typeStyle.FE;
-                const Icon = meta.icon;
-                return (
+              {loading && subtasks.length === 0 ? (
+                Array.from({ length: 4 }).map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell>
-                      <span className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 ${meta.cls}`}>
-                        <Icon className="h-3.5 w-3.5" /> {s.type}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div>{s.name}</div>
-                      {s.description && <div className="text-xs text-muted-foreground">{s.description}</div>}
-                    </TableCell>
-                    <TableCell>{s.sp}</TableCell>
-                    <TableCell>{s.assignee ?? <span className="text-muted-foreground">TBD</span>}</TableCell>
+                    <TableCell><Skeleton className="h-6 w-16" /></TableCell>
+                    <TableCell><Skeleton className="h-6 w-full" /></TableCell>
+                    <TableCell><Skeleton className="h-6 w-8" /></TableCell>
+                    <TableCell><Skeleton className="h-6 w-20" /></TableCell>
                   </TableRow>
-                );
-              })}
+                ))
+              ) : subtasks.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
+                    No sub-tasks yet. Click "Decompose" to generate.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                subtasks.map((s, i) => {
+                  const meta = typeStyle[s.type] ?? typeStyle.FE;
+                  const Icon = meta.icon;
+                  return (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <span className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 ${meta.cls}`}>
+                          <Icon className="h-3.5 w-3.5" /> {s.type}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div>{s.name}</div>
+                        {s.description && <div className="text-xs text-muted-foreground">{s.description}</div>}
+                      </TableCell>
+                      <TableCell>{s.sp}</TableCell>
+                      <TableCell>{s.assignee ?? <span className="text-muted-foreground">TBD</span>}</TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -178,20 +202,22 @@ export function BreakdownScreen() {
         <Card>
           <CardHeader><CardTitle>Team Load</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            {teamLoad.map((p) => (
-              <div key={p.name}>
-                <div className="mb-1 flex items-center justify-between">
-                  <span>{p.name}</span>
-                  <span className="text-muted-foreground">{p.load}%</span>
+            {loading && teamLoad.length === 0
+              ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)
+              : teamLoad.map((p) => (
+                <div key={p.name}>
+                  <div className="mb-1 flex items-center justify-between">
+                    <span>{p.name}</span>
+                    <span className="text-muted-foreground">{p.load}%</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                    <div
+                      className={p.load >= 80 ? "h-full bg-rose-500" : p.load >= 60 ? "h-full bg-amber-500" : "h-full bg-emerald-500"}
+                      style={{ width: `${p.load}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                  <div
-                    className={p.load >= 80 ? "h-full bg-rose-500" : p.load >= 60 ? "h-full bg-amber-500" : "h-full bg-emerald-500"}
-                    style={{ width: `${p.load}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              ))}
           </CardContent>
         </Card>
       </div>

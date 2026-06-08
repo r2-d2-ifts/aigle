@@ -8,6 +8,7 @@ import {
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { MetricCard } from "@/components/MetricCard";
 import { HealthScoreBadge } from "@/components/HealthScoreBadge";
 import { RoastModal } from "@/components/RoastModal";
@@ -23,7 +24,7 @@ const fallback = {
 export function DashboardScreen() {
   const router = useRouter();
   const [roastOpen, setRoastOpen] = useState(false);
-  const { data } = useApiData("/api/data/dashboard", fallback);
+  const { data, loading } = useApiData("/api/data/dashboard", fallback);
 
   return (
     <div className="space-y-6">
@@ -42,29 +43,45 @@ export function DashboardScreen() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <MetricCard label="Velocity" value="42 SP" delta={{ direction: "up", text: "+8 vs avg" }} icon={Gauge} />
-        <MetricCard label="Done" value="87%" sub="21 / 24 SP" icon={CheckCircle2} />
-        <MetricCard label="Spillover" value="13%" sub="3 tasks" delta={{ direction: "down", text: "-4 vs prev" }} icon={AlertCircle} />
-        <HealthScoreBadge score={data.healthScore} />
-      </div>
-
-      <Card>
-        <CardHeader><CardTitle>Velocity Trend</CardTitle></CardHeader>
-        <CardContent>
-          <div style={{ width: "100%", height: 280 }}>
-            <ResponsiveContainer>
-              <LineChart data={data.velocityTrend} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="sprint" className="text-muted-foreground" />
-                <YAxis className="text-muted-foreground" />
-                <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} />
-                <Line type="monotone" dataKey="velocity" stroke="#6366f1" strokeWidth={3} dot={{ r: 5, fill: "#6366f1" }} activeDot={{ r: 7 }} />
-              </LineChart>
-            </ResponsiveContainer>
+      {loading ? (
+        <>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-28 w-full" />
+            ))}
           </div>
-        </CardContent>
-      </Card>
+          <Card>
+            <CardHeader><CardTitle>Velocity Trend</CardTitle></CardHeader>
+            <CardContent><Skeleton className="h-[280px] w-full" /></CardContent>
+          </Card>
+        </>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <MetricCard label="Velocity" value="42 SP" delta={{ direction: "up", text: "+8 vs avg" }} icon={Gauge} />
+            <MetricCard label="Done" value="87%" sub="21 / 24 SP" icon={CheckCircle2} />
+            <MetricCard label="Spillover" value="13%" sub="3 tasks" delta={{ direction: "down", text: "-4 vs prev" }} icon={AlertCircle} />
+            <HealthScoreBadge score={data.healthScore} />
+          </div>
+
+          <Card>
+            <CardHeader><CardTitle>Velocity Trend</CardTitle></CardHeader>
+            <CardContent>
+              <div style={{ width: "100%", height: 280 }}>
+                <ResponsiveContainer>
+                  <LineChart data={data.velocityTrend} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                    <XAxis dataKey="sprint" className="text-muted-foreground" />
+                    <YAxis className="text-muted-foreground" />
+                    <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} />
+                    <Line type="monotone" dataKey="velocity" stroke="#6366f1" strokeWidth={3} dot={{ r: 5, fill: "#6366f1" }} activeDot={{ r: 7 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
 
       <RoastModal open={roastOpen} onOpenChange={setRoastOpen} />
     </div>

@@ -5,6 +5,7 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 import { Copy, Download, Flame, Sparkles, Gauge, AlertCircle, Clock, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { MetricCard } from "@/components/MetricCard";
 import { RoastModal } from "@/components/RoastModal";
 import { useApiData } from "@/hooks/useApiData";
@@ -17,7 +18,7 @@ const fallback = {
 };
 
 export function ReviewScreen() {
-  const { data } = useApiData("/api/data/dashboard", fallback);
+  const { data, loading: dataLoading } = useApiData("/api/data/dashboard", fallback);
   const [narrative, setNarrative] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [roastOpen, setRoastOpen] = useState(false);
@@ -63,6 +64,7 @@ export function ReviewScreen() {
         <Card>
           <CardHeader><CardTitle>Planned vs Done</CardTitle></CardHeader>
           <CardContent>
+            {dataLoading ? <Skeleton className="h-[260px] w-full" /> : (
             <div style={{ width: "100%", height: 260 }}>
               <ResponsiveContainer>
                 <BarChart data={data.plannedVsDone} margin={{ top: 10, right: 10, bottom: 0, left: -10 }}>
@@ -76,6 +78,7 @@ export function ReviewScreen() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
+            )}
           </CardContent>
         </Card>
 
