@@ -1,8 +1,9 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -57,9 +58,7 @@ function LoginForm() {
     <div className="flex min-h-screen w-full items-center justify-center bg-background p-6">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
-            <Sparkles className="h-6 w-6" />
-          </div>
+          <Image src="/logo.jpg" alt="aigle" width={96} height={96} className="mx-auto mb-3 rounded-lg" priority />
           <CardTitle className="tracking-tight">aigle</CardTitle>
           <div className="text-muted-foreground">AI-Powered Agile Manager</div>
         </CardHeader>

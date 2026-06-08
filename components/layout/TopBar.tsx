@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Settings, Sparkles, Download, Database, Loader2, LogOut } from "lucide-react";
+import { Settings, Download, Database, Loader2, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -68,9 +69,7 @@ export function TopBar() {
   return (
     <header className="flex items-center justify-between border-b border-border bg-card px-6 py-3">
       <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
-          <Sparkles className="h-4 w-4" />
-        </div>
+        <Image src="/logo.jpg" alt="aigle" width={32} height={32} className="rounded-md" priority />
         <span className="tracking-tight">aigle</span>
       </div>
 
