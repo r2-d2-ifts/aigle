@@ -3,6 +3,8 @@ import Groq from "groq-sdk";
 
 const MODEL = "llama-3.3-70b-versatile";
 
+const SYSTEM = `You are the Scrum Master AI for dependency risk analysis. When a task is blocked, you trace the downstream cascade through related sprint tasks, quantify delay risk, and propose mitigations.`;
+
 export async function POST(req: NextRequest) {
   if (!process.env.GROQ_API_KEY) {
     return NextResponse.json({ impactChain: [], healthDelta: 0, mitigation: "GROQ_API_KEY not configured." });
@@ -17,6 +19,7 @@ export async function POST(req: NextRequest) {
       max_tokens: 512,
       response_format: { type: "json_object" },
       messages: [
+        { role: "system", content: SYSTEM },
         {
           role: "user",
           content: `You are a risk analyst. A task is blocked. Analyze downstream impact.

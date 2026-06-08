@@ -126,8 +126,11 @@ export async function getHealthScore(): Promise<number> {
   return data?.[0]?.health_score ?? 0;
 }
 
+type FactorStatus = "ok" | "warn" | "err";
+const factorStatus = (v: number): FactorStatus => (v >= 75 ? "ok" : v >= 50 ? "warn" : "err");
+
 export async function getHealthFactors(): Promise<
-  { name: string; value: number; status: "ok" | "warn" }[]
+  { name: string; value: number; status: FactorStatus }[]
 > {
   const { data } = await supabase
     .from("sprint_health")
@@ -137,10 +140,10 @@ export async function getHealthFactors(): Promise<
   if (!data?.[0]) return [];
   const h = data[0];
   return [
-    { name: "Velocity", value: h.velocity_score, status: h.velocity_score >= 75 ? "ok" : "warn" },
-    { name: "Spillover", value: h.spillover_score, status: h.spillover_score >= 75 ? "ok" : "warn" },
-    { name: "Blockers", value: h.blocker_score, status: h.blocker_score >= 75 ? "ok" : "warn" },
-    { name: "Overcommit", value: h.overcommit_score, status: h.overcommit_score >= 75 ? "ok" : "warn" },
+    { name: "Velocity", value: h.velocity_score, status: factorStatus(h.velocity_score) },
+    { name: "Spillover", value: h.spillover_score, status: factorStatus(h.spillover_score) },
+    { name: "Blockers", value: h.blocker_score, status: factorStatus(h.blocker_score) },
+    { name: "Overcommit", value: h.overcommit_score, status: factorStatus(h.overcommit_score) },
   ];
 }
 

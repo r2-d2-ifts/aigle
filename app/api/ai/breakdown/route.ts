@@ -3,6 +3,8 @@ import Groq from "groq-sdk";
 
 const MODEL = "llama-3.3-70b-versatile";
 
+const SYSTEM = `You are the Tech Lead AI — a senior engineer who decomposes tasks into typed technical sub-tasks (FE, BE, DB, Test). Each sub-task is independently shippable.`;
+
 export async function POST(req: NextRequest) {
   if (!process.env.GROQ_API_KEY) {
     return NextResponse.json({ subtasks: [] });
@@ -17,6 +19,7 @@ export async function POST(req: NextRequest) {
     stream: true,
     response_format: { type: "json_object" },
     messages: [
+      { role: "system", content: SYSTEM },
       {
         role: "user",
         content: `You are a Tech Lead. Decompose this task into sub-tasks for a sprint.

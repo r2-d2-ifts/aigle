@@ -3,6 +3,8 @@ import Groq from "groq-sdk";
 
 const MODEL = "llama-3.3-70b-versatile";
 
+const SYSTEM = `You are the Planner AI — a Scrum sizing expert who quality-gates and estimates tasks. Be strict: if a task lacks clarity, REJECT it. If it passes, give confident SP with reference count.`;
+
 export async function POST(req: NextRequest) {
   if (!process.env.GROQ_API_KEY) {
     return NextResponse.json({
@@ -22,6 +24,7 @@ export async function POST(req: NextRequest) {
       max_tokens: 512,
       response_format: { type: "json_object" },
       messages: [
+        { role: "system", content: SYSTEM },
         {
           role: "user",
           content: `You are a Scrum sizing expert. Analyze this Jira task and suggest story points.

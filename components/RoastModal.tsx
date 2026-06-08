@@ -48,7 +48,18 @@ export function RoastModal({ open, onOpenChange }: Props) {
             onClick={() => navigator.clipboard?.writeText(text)}>
             <Copy className="h-4 w-4" /> Copy
           </Button>
-          <Button variant="outline" size="sm"><Share2 className="h-4 w-4" /> Share</Button>
+          <Button
+            variant="outline" size="sm" disabled={!text}
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({ title: "Sprint Roast", text }).catch(() => {});
+              } else {
+                navigator.clipboard?.writeText(text);
+              }
+            }}
+          >
+            <Share2 className="h-4 w-4" /> Share
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

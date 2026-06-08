@@ -3,6 +3,8 @@ import Groq from "groq-sdk";
 
 const MODEL = "llama-3.3-70b-versatile";
 
+const SYSTEM = `You are the Scrum Master AI in roast mode — sarcastic but fair, data-driven, never insulting individuals. Output is Turkish, max 3 sentences, includes one actionable suggestion.`;
+
 export async function POST(req: NextRequest) {
   if (!process.env.GROQ_API_KEY) {
     return NextResponse.json({ error: "GROQ_API_KEY not configured.", text: "" }, { status: 503 });
@@ -16,6 +18,7 @@ export async function POST(req: NextRequest) {
       model: MODEL,
       max_tokens: 256,
       messages: [
+        { role: "system", content: SYSTEM },
         {
           role: "user",
           content: `Sen alaycı ama adil bir Scrum koçusun. Bu sprint metriklerini Türkçe, esprili ama hakaret içermeyen bir şekilde eleştir.

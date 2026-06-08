@@ -4,7 +4,7 @@ import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { healthColor, healthLabel } from "@/lib/utils";
 
-type Factor = { name: string; value: number; status: "ok" | "warn" };
+type Factor = { name: string; value: number; status: "ok" | "warn" | "err" };
 type Props = { score: number; factors?: Factor[] };
 
 export function HealthScoreGauge({ score, factors = [] }: Props) {
@@ -42,9 +42,9 @@ export function HealthScoreGauge({ score, factors = [] }: Props) {
 
         <div className="flex-1 space-y-3">
           {factors.map((f) => {
-            const bar = f.status === "ok" ? "bg-emerald-500" : "bg-amber-500";
+            const bar = f.status === "ok" ? "bg-emerald-500" : f.status === "warn" ? "bg-amber-500" : "bg-rose-500";
             const Icon = f.status === "ok" ? CheckCircle2 : f.status === "warn" ? AlertTriangle : XCircle;
-            const iconColor = f.status === "ok" ? "text-emerald-500" : "text-amber-500";
+            const iconColor = f.status === "ok" ? "text-emerald-500" : f.status === "warn" ? "text-amber-500" : "text-rose-500";
             return (
               <div key={f.name} className="flex items-center gap-3">
                 <div className="w-24 text-muted-foreground">{f.name}</div>

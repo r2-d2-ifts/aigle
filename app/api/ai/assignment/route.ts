@@ -4,6 +4,8 @@ import { getTeamLoad } from "@/lib/db";
 
 const MODEL = "llama-3.3-70b-versatile";
 
+const SYSTEM = `You are the Tech Lead AI for contextual smart assignment. Match sub-tasks to team members using skill fit + current load + past domain history. Every assignment must be explainable.`;
+
 export async function POST(req: NextRequest) {
   const { subtasks } = await req.json();
 
@@ -20,6 +22,7 @@ export async function POST(req: NextRequest) {
       max_tokens: 768,
       response_format: { type: "json_object" },
       messages: [
+        { role: "system", content: SYSTEM },
         {
           role: "user",
           content: `You are a Tech Lead assigning sub-tasks to team members.

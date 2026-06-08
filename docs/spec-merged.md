@@ -260,8 +260,8 @@ Her AI çıktısı: "Neye göre bu sonucu verdim?" açıklaması içerir.
 | Layer | Technology |
 |-------|-----------|
 | Frontend | Next.js 15 (App Router) + Tailwind CSS v4 + shadcn/ui |
-| AI | Anthropic Claude API (claude-sonnet-4-5 or claude-haiku-4-5) |
-| Data | In-memory + JSON (mock fallback) |
+| AI | Groq API (llama-3.3-70b-versatile) |
+| Data | Supabase PostgreSQL |
 | Jira | Jira REST API v2/v3 (read-only) |
 
 ### 12.2 API Routes

@@ -104,7 +104,20 @@ export function ReviewScreen() {
               <div className="h-3 w-9/12 animate-pulse rounded bg-muted" />
             </div>
           ) : narrative ? (
-            <p className="leading-relaxed">{narrative}</p>
+            <div className="space-y-3 leading-relaxed">
+              {narrative.split(/\n\n+/).map((para, i) => {
+                const match = para.match(/^(.+?)\*\*(.+?)\*\*\s*\n([\s\S]+)$/);
+                if (match) {
+                  return (
+                    <div key={i}>
+                      <div className="mb-1 tracking-tight">{match[1]}<strong>{match[2]}</strong></div>
+                      <div className="text-muted-foreground">{match[3].trim()}</div>
+                    </div>
+                  );
+                }
+                return <p key={i}>{para}</p>;
+              })}
+            </div>
           ) : (
             <p className="text-muted-foreground italic">Click "Generate Review" to produce an AI sprint summary.</p>
           )}
@@ -114,7 +127,16 @@ export function ReviewScreen() {
                 onClick={() => navigator.clipboard?.writeText(narrative)}>
                 <Copy className="h-4 w-4" /> Copy
               </Button>
-              <Button variant="outline" size="sm" disabled={!narrative}>
+              <Button
+                variant="outline" size="sm" disabled={!narrative}
+                onClick={() => {
+                  const blob = new Blob([narrative], { type: "text/markdown" });
+                  const a = document.createElement("a");
+                  a.href = URL.createObjectURL(blob);
+                  a.download = `sprint-14-review.md`;
+                  a.click();
+                  URL.revokeObjectURL(a.href);
+                }}>
                 <Download className="h-4 w-4" /> Export
               </Button>
             </div>
