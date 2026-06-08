@@ -1,0 +1,35 @@
+package.json
+  s_e489c18f864c57::t_f07782ed87c6c4 50
+app/api/ai/breakdown/route.ts
+  s_e489c18f864c57::t_4081f1e4849c35 2,4-5,10-11,13-14,25-33,41,43-46,49-55
+app/api/risk/butterfly/route.ts
+  s_e489c18f864c57::t_37dc06183acb86 2,4-5,10-18,34-37,39-43
+app/api/ai/roast/route.ts
+  s_e489c18f864c57::t_9bdee17eacfda1 2,4-5,10-17,24-26,28-32
+app/api/ai/sizing/route.ts
+  s_e489c18f864c57::t_4df55f8322f826 2,4-5,8,11-12,14,39-42
+app/api/ai/assignment/route.ts
+  s_e489c18f864c57::t_93efb45be3cbf3 2,5-6,12-20,33-55
+components/screens/BreakdownScreen.tsx
+  s_e489c18f864c57::t_f378facc6ffefb 75-77
+package-lock.json
+  s_e489c18f864c57::t_9360eca27ae49a 49,3724-3731
+app/api/ai/review/route.ts
+  s_e489c18f864c57::t_5a77c1b6d4e535 2,4-5,10-11,13,33-34,40-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "a4c53f4e2e04bacc4fac72c582a9dd8b19983c10",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
