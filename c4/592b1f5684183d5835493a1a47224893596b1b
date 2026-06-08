@@ -1,0 +1,39 @@
+components/screens/PlanningScreen.tsx
+  s_e489c18f864c57::t_9ce98f6d5b1dca 28
+  s_e489c18f864c57::t_35ab77bf9996cc 97-115
+  s_e489c18f864c57::t_bb1f0dcece4360 9
+components/screens/ReviewScreen.tsx
+  s_e489c18f864c57::t_bb7a7f3257cf97 21
+  s_e489c18f864c57::t_9f3c6448fb0776 67
+  s_e489c18f864c57::t_56c305095a3f05 81
+  s_e489c18f864c57::t_cf7ed62ce9c378 8
+components/screens/HealthScreen.tsx
+  s_e489c18f864c57::t_a30376e5ad3795 8
+  s_e489c18f864c57::t_5abb73df033e30 22
+  s_e489c18f864c57::t_c40765851a7abb 69
+components/screens/DashboardScreen.tsx
+  s_e489c18f864c57::t_c5799025b892b0 11
+  s_e489c18f864c57::t_efa6e94bfaebd0 27
+  s_e489c18f864c57::t_3347ebadf0fa25 46-51,53-84
+components/screens/BreakdownScreen.tsx
+  s_e489c18f864c57::t_72ace3377b0ab1 205-218,220
+  s_e489c18f864c57::t_38ef0b93ba8d4d 143-144,146-149,151-178
+  s_e489c18f864c57::t_d512c57f10e5cd 3,9
+  s_e489c18f864c57::t_6a6355d5b7a8be 29-31,36-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "c4592b1f5684183d5835493a1a47224893596b1b",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
