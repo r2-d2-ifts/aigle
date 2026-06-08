@@ -1,15 +1,7 @@
 import { NextResponse } from "next/server";
-import { getSprints, getVelocity, isConfigured } from "@/lib/jiraClient";
-import { sprints, velocityTrend } from "@/lib/mockData";
+import { getSprints, getVelocityTrend } from "@/lib/db";
 
 export async function GET() {
-  if (!isConfigured()) {
-    return NextResponse.json({ source: "mock", sprints, velocityTrend });
-  }
-  try {
-    const [sprintData, velocityData] = await Promise.all([getSprints(), getVelocity()]);
-    return NextResponse.json({ source: "jira", sprints: sprintData, velocityTrend: velocityData });
-  } catch {
-    return NextResponse.json({ source: "mock", sprints, velocityTrend });
-  }
+  const [sprints, velocityTrend] = await Promise.all([getSprints(), getVelocityTrend()]);
+  return NextResponse.json({ source: "supabase", sprints, velocityTrend });
 }

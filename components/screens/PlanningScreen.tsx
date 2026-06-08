@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useApiData } from "@/hooks/useApiData";
-import { backlog as mockBacklog, type BacklogTask } from "@/lib/mockData";
+import type { BacklogTask, Sprint } from "@/lib/mockData";
 
 type AISizing = {
   passes: boolean;
@@ -18,21 +18,29 @@ type AISizing = {
   rejectReason?: string;
 };
 
-const fallback = { backlog: mockBacklog, sprints: [] };
+const fallback = {
+  backlog: [] as BacklogTask[],
+  sprints: [] as Sprint[],
+};
 
 export function PlanningScreen() {
   const { data } = useApiData("/api/data/planning", fallback);
-  const [selectedId, setSelectedId] = useState<string>(mockBacklog[0].id);
+  const [selectedId, setSelectedId] = useState<string>("");
   const [query, setQuery] = useState("");
   const [sizing, setSizing] = useState<Record<string, AISizing>>({});
   const [sizingLoading, setSizingLoading] = useState(false);
 
   const backlog = data.backlog;
-  const selected = backlog.find((t) => t.id === selectedId) ?? backlog[0];
+  // Auto-select first task when backlog loads
+  useEffect(() => {
+    if (!selectedId && backlog.length > 0) setSelectedId(backlog[0].id);
+  }, [backlog, selectedId]);
+
+  const selected = backlog.find((t) => t.id === selectedId) ?? null;
   const filtered = backlog.filter((t) => t.title.toLowerCase().includes(query.toLowerCase()));
 
   const runSizing = useCallback(async (task: BacklogTask) => {
-    if (sizing[task.id]) return; // already fetched
+    if (sizing[task.id]) return;
     setSizingLoading(true);
     try {
       const res = await fetch("/api/ai/sizing", {

@@ -6,13 +6,13 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useApiData } from "@/hooks/useApiData";
-import { sprints as mockSprints } from "@/lib/mockData";
+import type { Sprint } from "@/lib/mockData";
 
-const fallback = { sprints: mockSprints };
+const fallback = { sprints: [] as Sprint[], backlog: [] };
 
 export function TopBar() {
   const { data } = useApiData("/api/data/planning", fallback);
-  const sprints = data.sprints.length ? data.sprints : mockSprints;
+  const sprints = data.sprints;
   const [sprintId, setSprintId] = useState("s14");
   const [importing, setImporting] = useState(false);
   const [seeding, setSeeding] = useState(false);

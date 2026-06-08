@@ -12,18 +12,12 @@ import { MetricCard } from "@/components/MetricCard";
 import { HealthScoreBadge } from "@/components/HealthScoreBadge";
 import { RoastModal } from "@/components/RoastModal";
 import { useApiData } from "@/hooks/useApiData";
-import {
-  velocityTrend as mockVelocityTrend,
-  plannedVsDone as mockPlannedVsDone,
-  healthScore as mockHealthScore,
-  healthFactors as mockHealthFactors,
-} from "@/lib/mockData";
 
 const fallback = {
-  velocityTrend: mockVelocityTrend,
-  plannedVsDone: mockPlannedVsDone,
-  healthScore: mockHealthScore,
-  healthFactors: mockHealthFactors,
+  velocityTrend: [] as { sprint: string; velocity: number }[],
+  plannedVsDone: [] as { name: string; Planned: number; Done: number }[],
+  healthScore: 0,
+  healthFactors: [] as { name: string; value: number; status: "ok" | "warn" }[],
 };
 
 export function DashboardScreen() {

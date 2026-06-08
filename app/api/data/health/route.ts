@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
-import { getHealthScore, getHealthFactors } from "@/lib/db";
-import { blockableTasks, impactChain } from "@/lib/mockData";
+import { getHealthScore, getHealthFactors, getBlockableTasks } from "@/lib/db";
 
 export async function GET() {
-  const [healthScore, healthFactors] = await Promise.all([getHealthScore(), getHealthFactors()]);
-  return NextResponse.json({ healthScore, healthFactors, blockableTasks, impactChain });
+  const [healthScore, healthFactors, blockableTasks] = await Promise.all([
+    getHealthScore(),
+    getHealthFactors(),
+    getBlockableTasks(),
+  ]);
+  return NextResponse.json({ healthScore, healthFactors, blockableTasks, impactChain: [] });
 }

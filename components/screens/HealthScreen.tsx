@@ -1,27 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Play, ArrowDown, Lightbulb, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { HealthScoreGauge } from "@/components/HealthScoreGauge";
 import { useApiData } from "@/hooks/useApiData";
-import {
-  blockableTasks as mockTasks,
-  impactChain as mockChain,
-  healthScore as mockScore,
-  healthFactors as mockFactors,
-} from "@/lib/mockData";
 
 type ImpactNode = { level: number; status: "blocked" | "risk" | "ok"; label: string; detail: string };
 
-const fallback = { healthScore: mockScore, healthFactors: mockFactors, blockableTasks: mockTasks, impactChain: mockChain };
+const fallback = {
+  healthScore: 0,
+  healthFactors: [] as { name: string; value: number; status: "ok" | "warn" }[],
+  blockableTasks: [] as { id: string; name: string }[],
+  impactChain: [] as ImpactNode[],
+};
 
 export function HealthScreen() {
   const { data } = useApiData("/api/data/health", fallback);
-  const [taskId, setTaskId] = useState(data.blockableTasks[0]?.id ?? "db1");
+  const [taskId, setTaskId] = useState<string>("");
   const [simulating, setSimulating] = useState(false);
+
+  useEffect(() => {
+    if (!taskId && data.blockableTasks.length > 0) setTaskId(data.blockableTasks[0].id);
+  }, [data.blockableTasks, taskId]);
   const [simResult, setSimResult] = useState<{
     impactChain: ImpactNode[];
     healthDelta: number;

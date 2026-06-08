@@ -8,17 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MetricCard } from "@/components/MetricCard";
 import { RoastModal } from "@/components/RoastModal";
 import { useApiData } from "@/hooks/useApiData";
-import {
-  plannedVsDone as mockPlannedVsDone,
-  healthScore as mockHealthScore,
-  healthFactors as mockHealthFactors,
-} from "@/lib/mockData";
 
 const fallback = {
-  velocityTrend: [],
-  plannedVsDone: mockPlannedVsDone,
-  healthScore: mockHealthScore,
-  healthFactors: mockHealthFactors,
+  velocityTrend: [] as { sprint: string; velocity: number }[],
+  plannedVsDone: [] as { name: string; Planned: number; Done: number }[],
+  healthScore: 0,
+  healthFactors: [] as { name: string; value: number; status: "ok" | "warn" }[],
 };
 
 export function ReviewScreen() {

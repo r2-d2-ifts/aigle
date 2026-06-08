@@ -7,14 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useApiData } from "@/hooks/useApiData";
-import {
-  subtasks as mockSubtasks,
-  assignmentRationale as mockRationale,
-  teamLoad as mockTeamLoad,
-  type Subtask,
-} from "@/lib/mockData";
+import type { Subtask } from "@/lib/mockData";
 
-const fallback = { subtasks: mockSubtasks, assignmentRationale: mockRationale, teamLoad: mockTeamLoad };
+const fallback = {
+  subtasks: [] as Subtask[],
+  assignmentRationale: [] as { person: string; text: string }[],
+  teamLoad: [] as { name: string; load: number }[],
+};
 
 type AssignedSubtask = Subtask & { description?: string; dependencies?: string[] };
 
@@ -84,9 +83,8 @@ export function BreakdownScreen() {
         setRationale(newRationale);
       }
     } catch {
-      // Restore mock on error
-      setSubtasks(data.subtasks);
-      setRationale(data.assignmentRationale);
+      setSubtasks([]);
+      setRationale([]);
     } finally {
       setDecomposing(false);
       setAssigning(false);

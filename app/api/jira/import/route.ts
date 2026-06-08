@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
-import { getBacklog, getSprints, getVelocity, isConfigured } from "@/lib/jiraClient";
+import { getBacklog, getSprints, isConfigured } from "@/lib/jiraClient";
 import { upsertSprints, upsertTasks } from "@/lib/db";
-import { isSupabaseConfigured } from "@/lib/supabase";
 
 export async function POST() {
-  if (!isSupabaseConfigured()) {
-    return NextResponse.json({ error: "Supabase not configured — add credentials to .env.local" }, { status: 400 });
-  }
   if (!isConfigured()) {
     return NextResponse.json({ error: "Jira not configured — check JIRA_* env vars" }, { status: 400 });
   }
