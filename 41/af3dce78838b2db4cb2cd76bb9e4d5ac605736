@@ -1,0 +1,23 @@
+components/layout/TopBar.tsx
+  s_e489c18f864c57::t_7c5cf2875c9ea9 72
+  s_e489c18f864c57::t_4bb694f2e65d5c 4,6
+app/login/page.tsx
+  s_e489c18f864c57::t_f7fc227f63b2cb 61
+  s_e489c18f864c57::t_38e4fec7ef2f1a 4,6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "41af3dce78838b2db4cb2cd76bb9e4d5ac605736",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
