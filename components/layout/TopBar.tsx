@@ -1,21 +1,37 @@
 "use client";
 
-import { useState } from "react";
-import { Settings, Sparkles, Download, Database, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Settings, Sparkles, Download, Database, Loader2, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useApiData } from "@/hooks/useApiData";
+import { createClient } from "@/lib/supabase-browser";
 import type { Sprint } from "@/lib/types";
 
 const fallback = { sprints: [] as Sprint[], backlog: [] };
 
 export function TopBar() {
+  const router = useRouter();
   const { data } = useApiData("/api/data/planning", fallback);
   const sprints = data.sprints;
   const [sprintId, setSprintId] = useState("s14");
   const [importing, setImporting] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => setEmail(user?.email ?? null));
+  }, []);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  };
 
   const handleImport = async () => {
     setImporting(true);
@@ -89,6 +105,15 @@ export function TopBar() {
         <Button variant="ghost" size="sm">
           <Settings className="h-4 w-4" />
         </Button>
+
+        {email && (
+          <>
+            <span className="ml-2 text-muted-foreground text-xs hidden md:inline">{email}</span>
+            <Button variant="ghost" size="sm" onClick={handleLogout} title="Sign out">
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </>
+        )}
       </div>
     </header>
   );
