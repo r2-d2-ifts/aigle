@@ -55,7 +55,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center bg-background p-6">
+    <div className="flex w-full items-center justify-center p-6">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <Image src="/logo.jpg" alt="aigle" width={96} height={96} className="mx-auto mb-3 rounded-lg" priority />
