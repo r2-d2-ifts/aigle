@@ -52,10 +52,14 @@ create table if not exists subtasks (
 create table if not exists team_members (
   id uuid default gen_random_uuid() primary key,
   name text not null,
+  email text,
   skills text[] default '{}',
   current_load int default 0,
   domain_history jsonb default '[]'
 );
+
+-- Migration: add email column if missing
+alter table team_members add column if not exists email text;
 
 -- Sprint health snapshots
 create table if not exists sprint_health (
