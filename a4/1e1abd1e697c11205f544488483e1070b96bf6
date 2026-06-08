@@ -1,0 +1,24 @@
+app/api/ai/assignment/route.ts
+  s_e489c18f864c57::t_bec174b8879c61 1-67
+components/screens/BreakdownScreen.tsx
+  s_e489c18f864c57::t_45942ab6f6d753 68,151
+  s_e489c18f864c57::t_34ce6393db672d 3-4,10-15,19-20,30-36,39-67,69-96,107-111,116-124,148-150,153,167,171
+components/screens/PlanningScreen.tsx
+  s_e489c18f864c57::t_d1a8b7cf9f4295 3-4,12-20,27-28,34-70,89-95,104-106,115-119,121-128,130-141,143-145,147-151,153-161,170-177,179-181,195,199,201
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "a41e1abd1e697c11205f544488483e1070b96bf6",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
