@@ -1,0 +1,39 @@
+lib/supabase-server.ts
+  s_e489c18f864c57::t_891145e221064e 1-22
+package-lock.json
+  s_e489c18f864c57::t_64f55b1e2b777c 42,2701-2712,3318-3330,6424-6431,6802-6806
+components/layout/TopBar.tsx
+  s_e489c18f864c57::t_6cb0d7df2e6a9a 108-116
+  s_e489c18f864c57::t_41f1effd08f56d 3-5,10
+  s_e489c18f864c57::t_1a28469cbccb56 16,22-34
+lib/supabase-browser.ts
+  s_e489c18f864c57::t_4f30b988461c01 1-10
+app/login/page.tsx
+  s_e489c18f864c57::t_aba9b7e6982bd0 1-2,4-11,20-101
+  s_e489c18f864c57::t_604c8871814960 12-19
+  s_e489c18f864c57::t_e9e63ac0c88b38 3
+package.json
+  s_e489c18f864c57::t_071ac8b42b9def 43
+app/api/auth/logout/route.ts
+  s_e489c18f864c57::t_9d97003c93b9d4 1-8
+app/login/layout.tsx
+  s_e489c18f864c57::t_01817ecaa3f93c 1-4
+middleware.ts
+  s_e489c18f864c57::t_c9446fcab184c1 1-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "beb216fda3a68ca6af93a2da54bc44edf05226e4",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
