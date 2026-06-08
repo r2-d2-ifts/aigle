@@ -3,89 +3,190 @@ import { createClient } from "@supabase/supabase-js";
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!url || !key) {
-  console.error("Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
-  process.exit(1);
-}
+if (!url || !key) { console.error("Missing Supabase env vars"); process.exit(1); }
 
-const supabase = createClient(url, key, { auth: { persistSession: false } });
+const sb = createClient(url, key, { auth: { persistSession: false } });
 
-// ── Data ──────────────────────────────────────────────────────────────────────
+// ── Sprint story: growth → setback → recovery ────────────────────────────────
 
 const sprints = [
-  { id: "s10", name: "Sprint 10", start_date: "Mar 3", end_date: "Mar 14", status: "closed", velocity: 34, planned_sp: 34, done_sp: 34 },
-  { id: "s11", name: "Sprint 11", start_date: "Mar 17", end_date: "Mar 28", status: "closed", velocity: 38, planned_sp: 40, done_sp: 38 },
-  { id: "s12", name: "Sprint 12", start_date: "Mar 31", end_date: "Apr 11", status: "closed", velocity: 40, planned_sp: 38, done_sp: 40 },
-  { id: "s13", name: "Sprint 13", start_date: "Apr 14", end_date: "Apr 25", status: "closed", velocity: 34, planned_sp: 36, done_sp: 34 },
-  { id: "s14", name: "Sprint 14", start_date: "Apr 28", end_date: "May 9",  status: "active", velocity: 42, planned_sp: 24, done_sp: 21 },
+  { id: "s10", name: "Sprint 10", start_date: "Mar 3",  end_date: "Mar 14", status: "closed", velocity: 34, planned_sp: 38, done_sp: 34 },
+  { id: "s11", name: "Sprint 11", start_date: "Mar 17", end_date: "Mar 28", status: "closed", velocity: 38, planned_sp: 38, done_sp: 38 },
+  { id: "s12", name: "Sprint 12", start_date: "Mar 31", end_date: "Apr 11", status: "closed", velocity: 44, planned_sp: 40, done_sp: 44 },
+  { id: "s13", name: "Sprint 13", start_date: "Apr 14", end_date: "Apr 25", status: "closed", velocity: 29, planned_sp: 44, done_sp: 29 },
+  { id: "s14", name: "Sprint 14", start_date: "Apr 28", end_date: "May 9",  status: "active", velocity: 42, planned_sp: 40, done_sp: 34 },
 ];
 
-const tasks = [
-  { id: "t1", title: "Login page broken on Safari", type: "bug", current_sp: null, ai_sp: 5, confidence: 82, references_count: 8, rationale: "Benzer geçmiş tasklar ortalama 4.8 SP sürmüş. Safari özel davranışı önceki sprintlerde de gözlemlendi.", passes: true, reject_reason: null, sprint_id: null, status: "backlog" },
-  { id: "t2", title: "Add OAuth provider integration", type: "story", current_sp: null, ai_sp: 13, confidence: 41, references_count: 2, rationale: "Acceptance criteria eksik, geçmiş referans az.", passes: false, reject_reason: "No acceptance criteria. Add at least 3 testable conditions before sizing.", sprint_id: null, status: "backlog" },
-  { id: "t3", title: "Dashboard refactor — modular widgets", type: "story", current_sp: null, ai_sp: 8, confidence: 76, references_count: 5, rationale: "Component split daha önce yapıldı (S12). UI değişikliği görece düşük riskli.", passes: true, reject_reason: null, sprint_id: null, status: "backlog" },
-  { id: "t4", title: "Implement Payment Flow", type: "story", current_sp: null, ai_sp: 8, confidence: 88, references_count: 11, rationale: "Önceki ödeme entegrasyonu 7 SP sürmüştü, ek 1 SP regresyon testi için.", passes: true, reject_reason: null, sprint_id: "s14", status: "in_progress" },
-  { id: "t5", title: "Email notification spam loop", type: "bug", current_sp: null, ai_sp: 3, confidence: 90, references_count: 4, rationale: "Kök neden büyük olasılıkla cron + retry. Geçen sprintteki benzer hata 2 SP.", passes: true, reject_reason: null, sprint_id: null, status: "backlog" },
-];
+// ── 6-person team with distinct profiles ────────────────────────────────────
 
 const teamMembers = [
-  { name: "Ayşe", skills: ["React", "TypeScript", "CSS"], current_load: 40, domain_history: [{ domain: "FE", sprints: 3 }] },
-  { name: "Mehmet", skills: ["FastAPI", "Python", "PostgreSQL"], current_load: 55, domain_history: [{ domain: "BE", sprints: 4 }, { domain: "DB", sprints: 2 }] },
-  { name: "Can", skills: ["Playwright", "Jest", "QA"], current_load: 30, domain_history: [{ domain: "Test", sprints: 5 }] },
+  { name: "Ayşe",   skills: ["React", "TypeScript", "Design System", "Tailwind"], current_load: 40, domain_history: [{ domain: "FE", sprints: 5 }, { domain: "UI", sprints: 3 }] },
+  { name: "Mehmet", skills: ["FastAPI", "Python", "PostgreSQL", "Redis"],          current_load: 55, domain_history: [{ domain: "BE", sprints: 6 }, { domain: "DB", sprints: 4 }] },
+  { name: "Can",    skills: ["Playwright", "Jest", "k6", "Cypress"],              current_load: 30, domain_history: [{ domain: "Test", sprints: 6 }, { domain: "QA", sprints: 3 }] },
+  { name: "Zeynep", skills: ["React", "Node.js", "AWS", "Docker"],                current_load: 65, domain_history: [{ domain: "FE", sprints: 3 }, { domain: "DevOps", sprints: 2 }] },
+  { name: "Ali",    skills: ["Java", "Spring Boot", "Kafka", "Elasticsearch"],    current_load: 45, domain_history: [{ domain: "BE", sprints: 4 }, { domain: "Search", sprints: 3 }] },
+  { name: "Selin",  skills: ["React Native", "iOS", "Android", "Figma"],          current_load: 20, domain_history: [{ domain: "Mobile", sprints: 5 }, { domain: "FE", sprints: 2 }] },
 ];
 
-const sprintHealth = [{
-  sprint_id: "s14",
-  velocity_score: 95,
-  spillover_score: 60,
-  blocker_score: 80,
-  overcommit_score: 80,
-  health_score: 78,
-  spillover_rate: 13.0,
-  cycle_time_days: 2.3,
-  blocked_count: 2,
-}];
+// ── 15 backlog tasks — varied domains, types, quality ───────────────────────
+
+const tasks = [
+  // Backlog — passes gate
+  {
+    id: "t1", title: "Login page broken on Safari 17", type: "bug", current_sp: null,
+    ai_sp: 5, confidence: 82, references_count: 8, status: "backlog", sprint_id: null, passes: true, reject_reason: null,
+    rationale: "Safari-spesifik CSS rendering hatası. Benzer geçmiş tasklar ortalama 4.8 SP sürmüş. Geçen sprint login refactor yapıldı, bağlantılı olabilir.",
+  },
+  // Backlog — FAILS Anti-Bullshit gate
+  {
+    id: "t2", title: "Add OAuth provider integration", type: "story", current_sp: null,
+    ai_sp: 13, confidence: 38, references_count: 2, status: "backlog", sprint_id: null, passes: false,
+    reject_reason: "Acceptance criteria eksik. Hangi OAuth provider? Callback URL yapısı? Token refresh stratejisi? En az 3 test edilebilir kriter eklenene kadar boyutlandırma yapılamaz.",
+    rationale: "Yetersiz tanım nedeniyle boyutlandırma güvenilir değil.",
+  },
+  // Backlog — passes
+  {
+    id: "t3", title: "Dashboard widget modularization", type: "story", current_sp: null,
+    ai_sp: 8, confidence: 76, references_count: 5, status: "backlog", sprint_id: null, passes: true, reject_reason: null,
+    rationale: "Sprint 12'de benzer component refactor 7 SP sürdü. Widget izolasyonu iyi tanımlanmış, risk düşük.",
+  },
+  // In progress — has subtasks (key demo task for decomposition)
+  {
+    id: "t4", title: "Implement Payment Flow (Stripe)", type: "story", current_sp: 8,
+    ai_sp: 8, confidence: 91, references_count: 11, status: "in_progress", sprint_id: "s14", passes: true, reject_reason: null,
+    rationale: "Önceki ödeme entegrasyonu (PayPal, S11) 7 SP sürdü. Stripe daha iyi dökümanlı, ek 1 SP regresyon ve webhook testi için.",
+  },
+  // In progress — dependency for butterfly
+  {
+    id: "t5", title: "Payment DB schema & migrations", type: "story", current_sp: 3,
+    ai_sp: 3, confidence: 88, references_count: 6, status: "in_progress", sprint_id: "s14", passes: true, reject_reason: null,
+    rationale: "transactions, refunds, webhooks tabloları. Geçmiş şema migrasyonları 2-3 SP aralığında.",
+  },
+  // In progress — butterfly cascade target
+  {
+    id: "t6", title: "Checkout flow UI integration", type: "story", current_sp: 5,
+    ai_sp: 5, confidence: 84, references_count: 7, status: "in_progress", sprint_id: "s14", passes: true, reject_reason: null,
+    rationale: "t4 ve t5'e bağımlı. UI tarafı hazır, API entegrasyonu ve DB şeması tamamlanınca test edilebilir.",
+  },
+  // Backlog — passes
+  {
+    id: "t7", title: "Email notification spam loop fix", type: "bug", current_sp: null,
+    ai_sp: 3, confidence: 90, references_count: 4, status: "backlog", sprint_id: null, passes: true, reject_reason: null,
+    rationale: "Cron + retry kombinasyonu şüpheli. Sprint 13'te benzer bildirim hatası 2 SP'de çözüldü.",
+  },
+  // Backlog — FAILS Anti-Bullshit
+  {
+    id: "t8", title: "Kafka migration", type: "story", current_sp: null,
+    ai_sp: 21, confidence: 22, references_count: 1, status: "backlog", sprint_id: null, passes: false,
+    reject_reason: "Kapsam belirsiz. Hangi servisler migrate ediliyor? Event schema tasarımı yapıldı mı? Rollback planı? Bu task önce teknik spike gerektirir.",
+    rationale: "Yetersiz tanım — spike önce yapılmalı.",
+  },
+  // Backlog — passes
+  {
+    id: "t9", title: "Search performance optimization (Elasticsearch)", type: "story", current_sp: null,
+    ai_sp: 13, confidence: 71, references_count: 3, status: "backlog", sprint_id: null, passes: true, reject_reason: null,
+    rationale: "Mevcut p95 latency 1.2s, hedef 200ms. Index stratejisi ve query optimization gerekiyor. Benzer görev Sprint 11'de 11 SP sürdü.",
+  },
+  // Backlog — passes
+  {
+    id: "t10", title: "GDPR data export endpoint", type: "story", current_sp: null,
+    ai_sp: 8, confidence: 80, references_count: 4, status: "backlog", sprint_id: null, passes: true, reject_reason: null,
+    rationale: "KVKK uyumu zorunlu. Kullanıcı verisi export, anonymization ve audit log içeriyor. Hukuki gereksinimler netleşti.",
+  },
+  // Backlog — passes
+  {
+    id: "t11", title: "Mobile app crash on iOS 17.4 (swipe gesture)", type: "bug", current_sp: null,
+    ai_sp: 5, confidence: 85, references_count: 6, status: "backlog", sprint_id: null, passes: true, reject_reason: null,
+    rationale: "React Native gesture handler v2 ile iOS 17.4 uyumsuzluğu. Crash log mevcut, reproduksiyon adımları netleşti.",
+  },
+  // Backlog — passes
+  {
+    id: "t12", title: "API rate limiting (per-user, Redis)", type: "story", current_sp: null,
+    ai_sp: 5, confidence: 87, references_count: 5, status: "backlog", sprint_id: null, passes: true, reject_reason: null,
+    rationale: "Redis sliding window implementasyonu. Benzer middleware Sprint 10'da 4 SP sürdü. Endpoint konfigürasyonu ekstra 1 SP.",
+  },
+  // Backlog — passes
+  {
+    id: "t13", title: "Dark mode support — design system tokens", type: "story", current_sp: null,
+    ai_sp: 8, confidence: 73, references_count: 4, status: "backlog", sprint_id: null, passes: true, reject_reason: null,
+    rationale: "CSS custom properties hazır, component-level override gerekiyor. Sprint 12'de theme refactor 6 SP sürdü. +2 SP test coverage.",
+  },
+  // Backlog — FAILS Anti-Bullshit
+  {
+    id: "t14", title: "Push notification service", type: "story", current_sp: null,
+    ai_sp: 0, confidence: 0, references_count: 0, status: "backlog", sprint_id: null, passes: false,
+    reject_reason: "Platform belirtilmemiş (iOS? Android? Web?). Hangi bildirim tetikleyicileri? FCM mi APNs mi? Opt-in akışı tasarlandı mı? Boyutlandırma yapılamaz.",
+    rationale: "Boyutlandırma için yeterli bilgi yok.",
+  },
+  // Backlog — passes
+  {
+    id: "t15", title: "Checkout A/B test — CTA button variants", type: "story", current_sp: null,
+    ai_sp: 3, confidence: 92, references_count: 9, status: "backlog", sprint_id: null, passes: true, reject_reason: null,
+    rationale: "Feature flag altyapısı mevcut. A/B test setup ve analytics event'leri benzer görevde 2-3 SP sürdü. Yüksek güven.",
+  },
+];
+
+// ── Subtasks for 3 tasks ─────────────────────────────────────────────────────
+
+const subtasks = [
+  // t4 — Payment Flow (primary demo task)
+  { task_id: "t4", type: "FE",   name: "Stripe payment form UI",       description: "Card input, validation, loading states", sp: 2, assignee: "Ayşe",   dependencies: [] },
+  { task_id: "t4", type: "BE",   name: "Stripe webhook handler",        description: "Payment confirmation, failure, refund events", sp: 3, assignee: "Mehmet", dependencies: ["t5"] },
+  { task_id: "t4", type: "DB",   name: "Transactions & webhooks schema", description: "transactions, payment_events, refund_requests tables", sp: 1, assignee: "Mehmet", dependencies: [] },
+  { task_id: "t4", type: "Test", name: "E2E payment flow tests",         description: "Happy path + failure scenarios with Stripe test cards", sp: 2, assignee: "Can",    dependencies: ["t4"] },
+
+  // t9 — Search optimization
+  { task_id: "t9", type: "BE",   name: "Elasticsearch index redesign",   description: "Analyzer config, field mappings, shard strategy", sp: 5, assignee: "Ali",    dependencies: [] },
+  { task_id: "t9", type: "BE",   name: "Query optimization layer",        description: "Cached aggregations, filter rewrite, explain API", sp: 5, assignee: "Ali",    dependencies: [] },
+  { task_id: "t9", type: "Test", name: "Performance benchmarks (k6)",     description: "Load test before/after, p95/p99 validation", sp: 3, assignee: "Can",    dependencies: [] },
+
+  // t10 — GDPR export
+  { task_id: "t10", type: "BE",   name: "Data collection & serialization", description: "Aggregate user data from all services", sp: 3, assignee: "Mehmet", dependencies: [] },
+  { task_id: "t10", type: "BE",   name: "Anonymization pipeline",           description: "PII scrubbing, pseudonymization rules", sp: 2, assignee: "Mehmet", dependencies: [] },
+  { task_id: "t10", type: "FE",   name: "Export request UI & download",     description: "Self-service portal, email notification on ready", sp: 2, assignee: "Zeynep", dependencies: [] },
+  { task_id: "t10", type: "Test", name: "GDPR compliance audit tests",       description: "Data completeness, access log validation", sp: 1, assignee: "Can",    dependencies: [] },
+];
+
+// ── Sprint health for all 5 sprints ──────────────────────────────────────────
+
+const sprintHealth = [
+  // S10 — new member onboarding friction
+  { sprint_id: "s10", velocity_score: 70, spillover_score: 55, blocker_score: 60, overcommit_score: 65, health_score: 62, spillover_rate: 22.0, cycle_time_days: 3.1, blocked_count: 4 },
+  // S11 — solid execution
+  { sprint_id: "s11", velocity_score: 85, spillover_score: 75, blocker_score: 80, overcommit_score: 80, health_score: 80, spillover_rate: 13.0, cycle_time_days: 2.6, blocked_count: 2 },
+  // S12 — best sprint of the quarter
+  { sprint_id: "s12", velocity_score: 95, spillover_score: 90, blocker_score: 90, overcommit_score: 85, health_score: 90, spillover_rate: 5.0,  cycle_time_days: 1.9, blocked_count: 1 },
+  // S13 — tech debt + infra migration spike caused chaos
+  { sprint_id: "s13", velocity_score: 50, spillover_score: 30, blocker_score: 40, overcommit_score: 35, health_score: 38, spillover_rate: 47.0, cycle_time_days: 4.2, blocked_count: 8 },
+  // S14 — recovering, payment sprint, conservative planning
+  { sprint_id: "s14", velocity_score: 90, spillover_score: 65, blocker_score: 75, overcommit_score: 85, health_score: 78, spillover_rate: 15.0, cycle_time_days: 2.3, blocked_count: 2 },
+];
 
 // ── Seed ──────────────────────────────────────────────────────────────────────
 
 async function clear() {
-  console.log("Clearing existing data…");
-  await supabase.from("assignment_rationale").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-  await supabase.from("subtasks").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-  await supabase.from("sprint_health").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-  await supabase.from("tasks").delete().neq("id", "none");
-  await supabase.from("sprints").delete().neq("id", "none");
-  await supabase.from("team_members").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+  console.log("Clearing…");
+  await sb.from("assignment_rationale").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+  await sb.from("subtasks").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+  await sb.from("sprint_health").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+  await sb.from("tasks").delete().neq("id", "none");
+  await sb.from("sprints").delete().neq("id", "none");
+  await sb.from("team_members").delete().neq("id", "00000000-0000-0000-0000-000000000000");
 }
 
-async function seed() {
+async function run() {
   await clear();
+  const log = (label, r, n) =>
+    console.log(`  ${label}: ${r.error ? "ERROR: " + r.error.message : "✓ " + n}`);
 
-  const results = {};
+  log("sprints",     await sb.from("sprints").upsert(sprints, { onConflict: "id" }),         sprints.length);
+  log("tasks",       await sb.from("tasks").upsert(tasks, { onConflict: "id" }),             tasks.length);
+  log("subtasks",    await sb.from("subtasks").insert(subtasks),                             subtasks.length);
+  log("team",        await sb.from("team_members").insert(teamMembers),                      teamMembers.length);
+  log("health",      await sb.from("sprint_health").upsert(sprintHealth),                   sprintHealth.length);
 
-  let r = await supabase.from("sprints").upsert(sprints, { onConflict: "id" });
-  results.sprints = r.error ? `ERROR: ${r.error.message}` : `✓ ${sprints.length}`;
-
-  r = await supabase.from("tasks").upsert(tasks, { onConflict: "id" });
-  results.tasks = r.error ? `ERROR: ${r.error.message}` : `✓ ${tasks.length}`;
-
-  const subtaskRows = [
-    { task_id: "t4", type: "FE", name: "Payment UI form", sp: 2, assignee: "Ayşe", dependencies: [] },
-    { task_id: "t4", type: "BE", name: "Payment API", sp: 3, assignee: "Mehmet", dependencies: [] },
-    { task_id: "t4", type: "DB", name: "Transactions table", sp: 1, assignee: "Mehmet", dependencies: [] },
-    { task_id: "t4", type: "Test", name: "E2E payment flow", sp: 2, assignee: "Can", dependencies: [] },
-  ];
-  r = await supabase.from("subtasks").insert(subtaskRows);
-  results.subtasks = r.error ? `ERROR: ${r.error.message}` : `✓ ${subtaskRows.length}`;
-
-  r = await supabase.from("team_members").insert(teamMembers);
-  results.teamMembers = r.error ? `ERROR: ${r.error.message}` : `✓ ${teamMembers.length}`;
-
-  r = await supabase.from("sprint_health").upsert(sprintHealth);
-  results.sprintHealth = r.error ? `ERROR: ${r.error.message}` : `✓ ${sprintHealth.length}`;
-
-  console.log("\nSeed results:");
-  for (const [k, v] of Object.entries(results)) console.log(`  ${k}: ${v}`);
+  console.log("\nDone.");
+  console.log(`  ${sprints.length} sprints | ${tasks.length} tasks (${tasks.filter(t=>!t.passes).length} failing gate) | ${subtasks.length} subtasks | ${teamMembers.length} team | ${sprintHealth.length} health snapshots`);
 }
 
-seed().catch(console.error);
+run().catch(console.error);
