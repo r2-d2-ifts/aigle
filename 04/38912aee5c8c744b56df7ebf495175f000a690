@@ -1,0 +1,19 @@
+scripts/seed.mjs
+  s_e489c18f864c57::t_7b378b09f2a92f 6,8,10,13-17,20-32,34-126,129-147,150-163,168-174,177,179-180,182-186,188-189,192
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "0438912aee5c8c744b56df7ebf495175f000a690",
+  "prompts": {},
+  "sessions": {
+    "s_e489c18f864c57": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6da20c1-dc5f-4a9f-b4c1-4037c984fa00",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "DURSUN KOC <dursunkoc@gmail.com>"
+    }
+  }
+}
